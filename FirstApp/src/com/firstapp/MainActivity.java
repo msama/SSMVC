@@ -1,7 +1,6 @@
 package com.firstapp;
 
-
-import com.ssmvc_library.ItemListActivity;
+import com.ssmvc.ssmvc_lib.Lib;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -26,10 +25,10 @@ public class MainActivity extends Activity {
     }
     
     public void sendMessage(View view){
-    	Intent intent = new Intent(this, ItemListActivity.class);
+    	Intent intent = new Intent(this, Lib.class);
     	EditText editText = (EditText) findViewById(R.id.edit_message);
     	String message = editText.getText().toString();
-    	intent.putExtra(ItemListActivity.EXTRA_MESSAGE, message);
+    	intent.putExtra("Message", message);
     	startActivity(intent);
     }
 }

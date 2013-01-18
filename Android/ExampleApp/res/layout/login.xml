@@ -66,6 +66,6 @@
         android:layout_below="@+id/PasswordField"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
-        android:text="Login" />
+        android:text="@string/LoginButton" />
 
 </RelativeLayout>

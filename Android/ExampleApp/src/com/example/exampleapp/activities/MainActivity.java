@@ -28,6 +28,7 @@ public class MainActivity extends Activity {
 		dbCreator=new DatabaseCreator(getApplicationContext());
 
 		
+		
 	}
 
 	@Override

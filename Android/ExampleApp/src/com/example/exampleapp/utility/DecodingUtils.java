@@ -22,6 +22,7 @@ public class DecodingUtils {
 			JSONTokener tokener = new JSONTokener(jsonElement);
 			finalResult = new JSONObject(tokener);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 		return finalResult;

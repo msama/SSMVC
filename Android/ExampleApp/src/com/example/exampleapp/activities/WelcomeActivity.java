@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import com.example.exampleapp.R;
 import com.example.exampleapp.R.layout;
 import com.example.exampleapp.R.menu;
+import com.example.exampleapp.listeners.LogoutListener;
 import com.example.exampleapp.utility.SessionManager;
 
 import android.os.Bundle;
@@ -34,6 +35,7 @@ public class WelcomeActivity extends Activity {
 		setContentView(R.layout.welcome_activity);
 		
 		TextView detailsTextView = (TextView)findViewById(R.id.DetailsTextView);
+		((Button)findViewById(R.id.LogoutButton)).setOnClickListener(new LogoutListener(this));
 		
 		sessionManager = new SessionManager(getApplicationContext());
 		sessionManager.checkLogin();
@@ -46,6 +48,11 @@ public class WelcomeActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main_activity, menu);
 		return true;
+	}
+	
+	@Override
+	public void onBackPressed() {
+	    moveTaskToBack(true);
 	}
 
 }

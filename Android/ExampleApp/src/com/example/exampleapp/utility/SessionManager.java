@@ -91,4 +91,8 @@ public class SessionManager {
         // Staring Main Activity
         context.startActivity(i);
     }
+    
+    public String getUUID(){
+    	return pref.getString(UUID, "");
+    }
 }

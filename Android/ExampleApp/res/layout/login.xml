@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/linearLayout1"
         android:layout_centerHorizontal="true"
+        android:focusable="true"
         android:layout_marginBottom="19dp"
         android:ems="10" />
 

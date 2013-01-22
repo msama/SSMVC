@@ -1,4 +1,4 @@
-package com.example.exampleapp.utility;
+package com.ssmvc.ssmvc_lib;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +10,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+/*
+ * This class provides static methods to decode JSon objects
+ */
 public class DecodingUtils {
 
 	public static JSONObject decodeJson(InputStream input){

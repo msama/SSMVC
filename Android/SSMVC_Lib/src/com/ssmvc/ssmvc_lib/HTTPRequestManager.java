@@ -1,4 +1,4 @@
-package com.example.exampleapp.utility;
+package com.ssmvc.ssmvc_lib;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 
-import com.example.exampleapp.R;
+import com.ssmvc.ssmvc_lib.*;
 
 public class HTTPRequestManager {
 	private Context context;

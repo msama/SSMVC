@@ -25,11 +25,11 @@ public class SessionManager {
 	public static boolean checkSession(String uuid){
 		if(sessionMap.containsKey(uuid)){
 			loginSession s = sessionMap.get(uuid);
-			if(System.currentTimeMillis()-s.getSessionTime()<expirationTime){
+			//if(System.currentTimeMillis()-s.getSessionTime()<expirationTime){
 				s.setSessionTime(System.currentTimeMillis());  // update session time
 				sessionMap.put(uuid, s);
-				return true;
-			}
+//				return true;
+//			}
 		}
 		return false;
 	}

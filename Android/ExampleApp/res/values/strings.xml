@@ -6,7 +6,6 @@
     <string name="menu_settings">Settings</string>
     <string name="LoginButton">Login</string>
     <string name="title_activity_welcome">WelcomeActivity</string>
-    <string name="serverURI">http://10.16.101.57:8080/server/</string>
 	<string name="loginURI">loginJson</string>
 	<string name="logoutURI">logoutJson</string>
     

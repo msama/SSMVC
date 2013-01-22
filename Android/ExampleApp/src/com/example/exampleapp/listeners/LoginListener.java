@@ -17,8 +17,8 @@ import com.example.exampleapp.activities.MainActivity;
 import com.example.exampleapp.activities.WelcomeActivity;
 import com.example.exampleapp.dialogs.BaseDialog;
 import com.example.exampleapp.tasks.LoginRequestTask;
-import com.example.exampleapp.utility.DecodingUtils;
 import com.example.exampleapp.utility.SessionManager;
+import com.ssmvc.ssmvc_lib.DecodingUtils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +26,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 
+/*
+ * LoginListener implements the OnClickListener of the button Login of the MainActivity.
+ * Its main purpose is controlling if the user has provided some credentials and start an asynchronous
+ * activity to send them to the server.
+ */
 public class LoginListener implements OnClickListener {
 
 	EditText username, password;

@@ -12,6 +12,10 @@ import android.view.Menu;
 import android.widget.Button;
 import android.widget.EditText;
 
+/*
+ * Entry point of the App.
+ * This activity manages user login into the System.
+ */
 public class MainActivity extends Activity {
 	
 	private EditText username, password;
@@ -25,10 +29,7 @@ public class MainActivity extends Activity {
 		username = (EditText) findViewById(R.id.UsernameField);
 		password = (EditText) findViewById(R.id.PasswordField);
 		((Button)findViewById(R.id.loginButton)).setOnClickListener(new LoginListener(username, password, this));
-		dbCreator=new DatabaseCreator(getApplicationContext());
-
-		
-		
+		dbCreator=new DatabaseCreator(getApplicationContext());	
 	}
 
 	@Override
@@ -37,6 +38,7 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main_activity, menu);
 		return true;
 	}
+	
 	
 	public void loginButtonEnabled(boolean b){
 		((Button)findViewById(R.id.loginButton)).setEnabled(b);

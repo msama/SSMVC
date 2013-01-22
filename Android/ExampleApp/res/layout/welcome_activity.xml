@@ -14,7 +14,7 @@
         android:layout_marginTop="39dp"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+    
     <Button
         android:id="@+id/LogoutButton"
         style="?android:attr/buttonStyleSmall"
@@ -22,6 +22,24 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
+        android:layout_marginBottom="18dp"
         android:text="Logout" />
+
+    <Button
+        android:id="@+id/SendStateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/DetailsTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp"
+        android:text="Button" />
+
+    <Spinner
+        android:id="@+id/StateListSpinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/DetailsTextView"
+        android:layout_marginTop="38dp" />
 
 </RelativeLayout>

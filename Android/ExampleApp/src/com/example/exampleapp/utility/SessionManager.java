@@ -9,6 +9,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+/*
+ * The application needs to know information about the current Http Session. This class provides a way
+ * to store these information through SharedPreferences global variables.
+ */
 public class SessionManager {
 	
 	// Shared Preferences

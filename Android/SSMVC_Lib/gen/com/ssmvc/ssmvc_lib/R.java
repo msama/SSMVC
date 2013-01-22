@@ -26,6 +26,7 @@ public final class R {
         public static int app_name=0x7f040000;
         public static int hello_world=0x7f040001;
         public static int menu_settings=0x7f040002;
+        public static int serverURI=0x7f040003;
     }
     public static final class style {
         /** 

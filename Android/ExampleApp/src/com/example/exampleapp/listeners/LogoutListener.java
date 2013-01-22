@@ -1,10 +1,6 @@
 package com.example.exampleapp.listeners;
 
-import java.util.ArrayList;
-
-import com.example.exampleapp.R;
 import com.example.exampleapp.tasks.LogoutRequestTask;
-import com.example.exampleapp.utility.HTTPRequestManager;
 
 import android.content.Context;
 import android.view.View;

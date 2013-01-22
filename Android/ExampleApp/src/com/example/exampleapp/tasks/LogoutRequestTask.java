@@ -8,8 +8,8 @@ import com.example.exampleapp.R;
 import com.example.exampleapp.activities.MainActivity;
 import com.example.exampleapp.activities.WelcomeActivity;
 import com.example.exampleapp.dialogs.BaseDialog;
-import com.example.exampleapp.utility.HTTPRequestManager;
 import com.example.exampleapp.utility.SessionManager;
+import com.ssmvc.ssmvc_lib.HTTPRequestManager;
 
 import android.content.Context;
 import android.content.Intent;

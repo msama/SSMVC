@@ -1,28 +1,20 @@
 package com.example.exampleapp.activities;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+
 import java.util.HashMap;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.example.exampleapp.R;
-import com.example.exampleapp.R.layout;
-import com.example.exampleapp.R.menu;
 import com.example.exampleapp.listeners.LogoutListener;
+import com.example.exampleapp.listeners.SendStateListener;
 import com.example.exampleapp.utility.SessionManager;
-
+import com.ssmvc.ssmvc_lib.*;
 import android.os.Bundle;
 import android.app.Activity;
+import android.database.Cursor;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.Menu;
-import android.view.View;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class WelcomeActivity extends Activity {
@@ -41,6 +33,29 @@ public class WelcomeActivity extends Activity {
 		sessionManager.checkLogin();
 		HashMap<String, String> details = sessionManager.getDetails();
 		detailsTextView.setText("Welcome "+details.get("name")+" "+details.get("surname"));
+		
+		dbDAO dao = new dbDAO(this);
+		dao.open();
+//		dao.removeStates();
+//		dao.initStates();
+//		dao.addState("Sad");
+		Cursor cursor=dao.getAllStates();
+		System.out.println("Count:"+cursor.getCount());
+		
+		 // make an adapter from the cursor
+	    String[] from = new String[] {"DESCRIPTION"};
+	    int[] to = new int[] {android.R.id.text1};
+	    SimpleCursorAdapter sca=new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, cursor, from, to, 0);
+
+	    // set layout for activated adapter
+	    sca.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); 
+
+	    // get xml file spinner and set adapter 
+	    Spinner spin = (Spinner) this.findViewById(R.id.StateListSpinner);
+	    spin.setAdapter(sca);
+	    dao.close();
+	    
+	    ((Button)findViewById(R.id.SendStateButton)).setOnClickListener(new SendStateListener(this,dao));
 	}
 
 	@Override

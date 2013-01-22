@@ -17,12 +17,11 @@ public class DatabaseCreator extends SQLiteOpenHelper{
 	
 	private static final String CREATE_STATE= "" +
 			"CREATE TABLE STATE(" +
-			"ID INT NOT NULL AUTO_INCREMENT," +
-			"DESCRIPTION VARCHAR(100) NOT NULL," +
-			"PRIMARY KEY (ID)" +
+			"ID INTEGER PRIMARY KEY AUTOINCREMENT," +
+			"DESCRIPTION VARCHAR(100) NOT NULL" +
 			")";
 
-	private static final int VERSION=1;
+	private static final int VERSION=2;
 	
 	public DatabaseCreator(Context context){
 		super(context, DATABASE_NAME, null, VERSION);
@@ -30,6 +29,7 @@ public class DatabaseCreator extends SQLiteOpenHelper{
 	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		System.out.println("Creazione");
 		db.execSQL(CREATE_STATE);
 		db.execSQL(CREATE_STATE_DETAILS);
 	}
@@ -37,6 +37,7 @@ public class DatabaseCreator extends SQLiteOpenHelper{
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// TODO Auto-generated method stub
+		System.out.println("Update");
 		
 	}
 

@@ -9,11 +9,9 @@ import android.view.View.OnClickListener;
 public class SendStateListener implements OnClickListener {
 	
 	private WelcomeActivity context;
-	private dbDAO dao;
 
-	public SendStateListener(WelcomeActivity context, dbDAO dao){
+	public SendStateListener(WelcomeActivity context){
 		this.context = context;
-		this.dao = dao;
 	}
 	
 	

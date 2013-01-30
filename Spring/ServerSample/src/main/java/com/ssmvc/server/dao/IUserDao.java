@@ -12,5 +12,7 @@ public interface IUserDao {
 	public List<User> findAllUsersWithStates();
 	
 	public loginResponse checkCredentials(String username, String password);
+	
+	public String findAllUser_Roles();
 
 }

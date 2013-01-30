@@ -1,5 +1,6 @@
 package com.ssmvc.server.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.AttributeOverride;
@@ -13,7 +14,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="user_role")
-public class User_Role {
+public class User_Role implements Serializable{
 	private int Role_Id;
 	private int User_Id;
 	private Date fromDate;

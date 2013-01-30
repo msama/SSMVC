@@ -1,6 +1,6 @@
 package com.example.exampleapp.activities;
 
-
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.example.exampleapp.R;
@@ -8,55 +8,75 @@ import com.example.exampleapp.listeners.LogoutListener;
 import com.example.exampleapp.listeners.SendStateListener;
 import com.example.exampleapp.utility.SessionManager;
 import com.ssmvc.ssmvc_lib.*;
+import com.ssmvc.ssmvc_lib.services.*;
+
 import android.os.Bundle;
+import android.os.IBinder;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class WelcomeActivity extends Activity {
-	
+/**
+ * 
+ * @author mircobordoni
+ * <br><br>
+ * This activity is the first one showed after a successful login. <br>
+ * It gives the chance to send the actual mood of the user, update the list of possible mood states and
+ * logout from the system.
+ */
+public class WelcomeActivity extends Activity implements OnClickListener,
+		IPersistanceCallbacks {
+
 	private SessionManager sessionManager;
+	private PersistanceService persistanceService;
+	private IPersistanceCallbacks resultProcessor = this;
+	private boolean isBound;
+	private Cursor cursor;
+	private Activity context = this;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.welcome_activity);
+
+		TextView detailsTextView = (TextView) findViewById(R.id.DetailsTextView);
 		
-		TextView detailsTextView = (TextView)findViewById(R.id.DetailsTextView);
-		((Button)findViewById(R.id.LogoutButton)).setOnClickListener(new LogoutListener(this));
-		
+		// Create a new Session manager
 		sessionManager = new SessionManager(getApplicationContext());
 		sessionManager.checkLogin();
+		
 		HashMap<String, String> details = sessionManager.getDetails();
-		detailsTextView.setText("Welcome "+details.get("name")+" "+details.get("surname"));
-		
-		dbDAO dao = new dbDAO(this);
-		dao.open();
-//		dao.removeStates();
-//		dao.initStates();
-//		dao.addState("Sad");
-		Cursor cursor=dao.getAllStates();
-		System.out.println("Count:"+cursor.getCount());
-		
-		 // make an adapter from the cursor
-	    String[] from = new String[] {"DESCRIPTION"};
-	    int[] to = new int[] {android.R.id.text1};
-	    SimpleCursorAdapter sca=new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, cursor, from, to, 0);
+		detailsTextView.setText("Welcome " + details.get("name") + " "
+				+ details.get("surname"));
 
-	    // set layout for activated adapter
-	    sca.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); 
+//		 dbDAO.removeAllStates();
+		
+		// Bind this Activity to Persistance Service
+		Intent intent = new Intent(this, PersistanceService.class);
+		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
 
-	    // get xml file spinner and set adapter 
-	    Spinner spin = (Spinner) this.findViewById(R.id.StateListSpinner);
-	    spin.setAdapter(sca);
-	    dao.close();
-	    
-	    ((Button)findViewById(R.id.SendStateButton)).setOnClickListener(new SendStateListener(this,dao));
+		// Adding the proper listener to each button of the View
+		((Button) findViewById(R.id.LogoutButton))
+		.setOnClickListener(new LogoutListener(this));
+		((Button) findViewById(R.id.SendStateButton))
+				.setOnClickListener(new SendStateListener(this));
+		((Button) findViewById(R.id.StatesDigestButton))
+				.setOnClickListener(this);
+		((Button) findViewById(R.id.UpdateStatesButton))
+		.setOnClickListener(this);
 	}
+
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -64,10 +84,77 @@ public class WelcomeActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main_activity, menu);
 		return true;
 	}
-	
+
 	@Override
 	public void onBackPressed() {
-	    moveTaskToBack(true);
+		moveTaskToBack(true);
 	}
+
+	/**
+	 * Click listener method. 
+	 */
+	@Override
+	public void onClick(View v) {
+		if(v==((Button) findViewById(R.id.StatesDigestButton))){ // Start StatesDigestActivity
+			Intent intent = new Intent(this, StatesDigestActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(intent);
+		}else if(v==((Button) findViewById(R.id.UpdateStatesButton))){	// Start PersistanceService getAllStates method
+			ArrayList<String[]> params = new ArrayList<String[]>();
+			params.add(new String[]{"uuid",sessionManager.getUUID()});
+			if(isBound)persistanceService.getAllStates(resultProcessor,params);
+		}
+	}
+
+	/**
+	 * Callback defined to manage the results provided by PersistanceService.
+	 */
+	@Override
+	public void onPersistanceResult(Object... objects) {
+		cursor = dbDAO.getAllStates();
+		String[] from = new String[] { "DESCRIPTION" };
+		int[] to = new int[] { android.R.id.text1 };
+		final SimpleCursorAdapter sca = new SimpleCursorAdapter(
+				this, android.R.layout.simple_spinner_item, cursor,
+				from, to, 0);
+
+		// set layout for activated adapter
+		sca.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+		// get xml file spinner and set adapter
+		runOnUiThread(new Runnable() {
+			public void run() {
+				Spinner spin = (Spinner)context 
+						.findViewById(R.id.StateListSpinner);
+				spin.setAdapter(sca);
+			}
+		});
+
+	}
+
+	@Override
+	public Context getContext() {
+		return this;
+	}
+
+	// ServiceConnection has to be implemented to manage connection to Services.
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+
+		
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			PersistanceLocalBinder binder = (PersistanceLocalBinder) service;
+			persistanceService = (PersistanceService) binder.getService();
+			ArrayList<String[]> params = new ArrayList<String[]>();
+			params.add(new String[]{"uuid",sessionManager.getUUID()});
+			// Call persistance service method to update local states with new ones from server
+			persistanceService.getAllStates(resultProcessor,params);
+			isBound = true;
+		}
+
+		public void onServiceDisconnected(ComponentName arg0) {
+			isBound = false;
+		}
+
+	};
 
 }

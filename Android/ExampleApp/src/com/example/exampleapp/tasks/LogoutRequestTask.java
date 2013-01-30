@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import com.example.exampleapp.R;
 import com.example.exampleapp.activities.MainActivity;
-import com.example.exampleapp.activities.WelcomeActivity;
 import com.example.exampleapp.dialogs.BaseDialog;
 import com.example.exampleapp.utility.SessionManager;
 import com.ssmvc.ssmvc_lib.HTTPRequestManager;
@@ -15,6 +14,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 
+/**
+ * 
+ * @author mircobordoni
+ * <br><br>
+ * Asynchronous task used to handle a logout request. If the logout succeeded it starts the MainActivity.
+ * Otherwise it shows an error dialog.
+ *
+ */
 public class LogoutRequestTask extends AsyncTask<Void, Void, JSONObject>{
 
 	private Context context;
@@ -27,10 +34,9 @@ public class LogoutRequestTask extends AsyncTask<Void, Void, JSONObject>{
 	
 	@Override
 	protected JSONObject doInBackground(Void... params) {
-		HTTPRequestManager requestManager = new HTTPRequestManager(context);
 		ArrayList<String[]> parameters = new ArrayList<String[]>();
 		parameters.add(new String[]{"uuid",sessionManager.getUUID()});
-		return requestManager.sendRequest(parameters,context.getString(R.string.logoutURI));
+		return HTTPRequestManager.sendRequest(parameters,context.getString(R.string.logoutURI));
 	}
 	
 	@Override

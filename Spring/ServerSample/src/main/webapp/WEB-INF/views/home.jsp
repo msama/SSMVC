@@ -6,9 +6,9 @@
 </head>
 <body>
 <h1>
-	Hello worlddd!  
+Welcome
 </h1>
 
-<P>  The time on the server is ${serverTime}. </P>
+<a href="/server/WebLogin">Login</a>
 </body>
 </html>

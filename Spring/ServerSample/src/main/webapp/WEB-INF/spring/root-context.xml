@@ -16,15 +16,16 @@
 	
 	<jdbc:embedded-database id="dataSource" type="H2"> 
 		<jdbc:script location="classpath:model.sql"/> 
-		<jdbc:script location="classpath:model-data.sql"/> 
+		<jdbc:script location="classpath:model-data.sql"/>  
 	</jdbc:embedded-database>	
 	
 	 
-	<!-- <bean id="contactDao" class="com.ssmvc.server.dao.impl.ContactDaoImpl">
-		<property name="sessionFactory" ref="sessionFactory"></property> 
-	</bean> -->
 	
 	<bean id="userDao" class="com.ssmvc.server.dao.impl.UserDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property> 
+	</bean>
+	
+	<bean id="stateDao" class="com.ssmvc.server.dao.impl.StateDaoImpl">
 		<property name="sessionFactory" ref="sessionFactory"></property> 
 	</bean>
 	

@@ -1,5 +1,6 @@
 package com.ssmvc.server.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.*;
@@ -7,14 +8,19 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="state_details")
-public class State_Details {
+@NamedQueries({
+	@NamedQuery(name="StateDetails.getStateDetails",
+			query="select sd from State_Details sd left join fetch sd.state left join fetch sd.user")
+})
+public class State_Details implements Serializable{
 	
 	private Date Time_Date;
-	private int User_Id;
-	private int State_Id;
+	private long User_Id;
+	private String State_Id;
 	private User user;
 	private State state;
-	
+	private int version;
+
 	@Id
     @AttributeOverrides({
     @AttributeOverride(name = "User_Id",
@@ -35,20 +41,20 @@ public class State_Details {
 	}
 	
 	@Column(name = "USER_ID")
-	public int getUser_Id(){
+	public long getUser_Id(){
 		return User_Id;
 	}
 
-	public void setUser_Id(int User_Id){
+	public void setUser_Id(long User_Id){
 		this.User_Id=User_Id;
 	}
 	
 	@Column(name = "STATE_ID")
-	public int getState_Id(){
+	public String getState_Id(){
 		return State_Id;
 	}
 	
-	public void setState_Id(int State_Id){
+	public void setState_Id(String State_Id){
 		this.State_Id=State_Id;
 	}
 	
@@ -75,6 +81,15 @@ public class State_Details {
 	public String toString(){
 		return "State Details - State_Id:"+this.State_Id+" User_Id:"+this.User_Id+
 				" Date:"+this.Time_Date;
+	}
+	
+	@Column(name = "VERSION")
+	public int getVersion() {
+		return version;
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
 	}
 }
 

@@ -6,6 +6,15 @@ import android.content.Context;
 import android.view.View;
 import android.view.View.OnClickListener;
 
+/**
+ * 
+ * @author mircobordoni <br><br>
+ * 
+ * LogoutListener implements the OnClickListener of the button Logout in the MainActivity. <br>
+ * Its main purpose is sending a logout request to the server using the proper asynchronous task, in this
+ * case LogoutRequestTask
+ *
+ */
 public class LogoutListener implements OnClickListener{
 	
 	private Context context;

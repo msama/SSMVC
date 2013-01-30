@@ -13,7 +13,9 @@ import javax.persistence.*;
 @Table(name="user")
 @NamedQueries({
 	@NamedQuery(name="User.findWithStateDetails",
-			query="select distinct u from User u left join fetch u.stateDetails sd")
+			query="select distinct u from User u left join fetch u.stateDetails sd"),
+	@NamedQuery(name="User.checkCredentials",
+			query="select distinct u from User u left join fetch u.userRole where u.username=:username and u.password=:password")
 })
 public class User implements Serializable {
 	private Long id;

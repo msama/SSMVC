@@ -14,7 +14,9 @@ import com.ssmvc.ssmvc_lib.HTTPRequestManager;
 import android.content.Intent;
 import android.os.AsyncTask;
 
-/*
+/**
+ * @author mircobordoni
+ * <br><br>
  * Asynchronous task used to send login information to the server and wait for a response.
  */
 public class LoginRequestTask extends AsyncTask<Void, Void, JSONObject>{
@@ -35,27 +37,37 @@ public class LoginRequestTask extends AsyncTask<Void, Void, JSONObject>{
 		context.loginButtonEnabled(false);
 	}
 
-	
+	/*
+	 * Asynchronous task: start a new thread and send a request to the server. The response is a
+	 * JSONObject and it is automatically passed to the onPostExecute method.
+	 * 
+	 */
 	@Override
 	protected JSONObject doInBackground(Void... params) {
-		HTTPRequestManager requestManager = new HTTPRequestManager(context);
-		return requestManager.sendRequest(parameters,context.getString(R.string.loginURI));
+		return HTTPRequestManager.sendRequest(parameters,context.getString(R.string.loginURI));
 	}
 
+	/*
+	 * Method executed in the main thread and handling the result of doInBackground. 
+	 * If login succeeded it initializes a new Session using the SessionManager and start a new 
+	 * WelcomeActivity. Otherwise it shows an error dialog.
+	 */
 	@Override
 	protected void onPostExecute(JSONObject finalResult){
 		try {
 			if (finalResult != null) {
 				// If the user has provided correct credentials start the WelcomeActivity
+				
 				if (finalResult.getString("success").equals("true")) {
 					System.out.println("name:" + finalResult.getString("name")
 							+ " " + finalResult.getString("surname") + " "
 							+ "ID:" + finalResult.getString("id")+
 							" UUID:"+ finalResult.getString("uuid"));
+					System.out.println(finalResult.getJSONArray("roles").get(0));
 					Intent intent = new Intent(context, WelcomeActivity.class);
 					sessionManager.login(finalResult.getString("id"), 
 							finalResult.getString("name"), finalResult.getString("surname"),
-							finalResult.getString("uuid"));
+							finalResult.getString("uuid"),finalResult.getJSONArray("roles"));
 					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					context.loginButtonEnabled(true);
 					context.startActivity(intent);

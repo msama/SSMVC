@@ -14,16 +14,22 @@ import org.json.JSONObject;
 
 import android.content.Context;
 
-import com.ssmvc.ssmvc_lib.*;
-
+/**
+ * 
+ * @author mircobordoni
+ * <br><br>
+ * 
+ * This class provides static methods to send an HTTP request to the server. The response is decoded
+ * and returned as a JSONObject.
+ */
 public class HTTPRequestManager {
-	private Context context;
+	private static Context context;
 	
 	public HTTPRequestManager(Context context){
 		this.context=context;
 	}
 	
-	public JSONObject sendRequest(ArrayList<String[]> parameters, String relativeURI){
+	public static JSONObject sendRequest(ArrayList<String[]> parameters, String relativeURI){
 		DefaultHttpClient client = new DefaultHttpClient();
 		HttpResponse response = null;
 		JSONObject finalResult = null;

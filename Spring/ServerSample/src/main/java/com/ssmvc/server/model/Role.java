@@ -2,6 +2,7 @@ package com.ssmvc.server.model;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,7 +10,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="ROLE")
-public class Role {
+public class Role implements Serializable {
 
 	private Long id;
 	private String description;

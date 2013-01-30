@@ -11,7 +11,7 @@ import com.ssmvc.server.formModel.logoutResponse;
 import com.ssmvc.server.utils.SessionManager;
 
 @Controller
-public class LogoutController {
+public class JSonLogoutController {
 	
 	@RequestMapping( value = "/logoutJson",method = RequestMethod.POST)
 	public @ResponseBody logoutResponse logout(@RequestBody logoutModel logout){

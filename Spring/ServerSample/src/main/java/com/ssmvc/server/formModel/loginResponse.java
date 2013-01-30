@@ -1,5 +1,10 @@
 package com.ssmvc.server.formModel;
 
+
+import java.util.Set;
+
+import com.ssmvc.server.model.User_Role;
+
 public class loginResponse {
 
 	private boolean success;
@@ -7,7 +12,8 @@ public class loginResponse {
 	private String surname;
 	private Long ID;
 	private String UUID;
-
+	private Set<User_Role> userRoleSet;
+	
 
 	public Long getID() {
 		return ID;
@@ -47,5 +53,13 @@ public class loginResponse {
 
 	public void setUUID(String uUID) {
 		UUID = uUID;
+	}
+	
+	public void setUserRoleSet(Set<User_Role> userRoleSet){
+		this.userRoleSet=userRoleSet;
+	}
+	
+	public Set<User_Role> getUserRoleSet(){
+		return this.userRoleSet;
 	}
 }

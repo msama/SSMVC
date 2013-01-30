@@ -10,7 +10,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-/*
+/**
+ * @author mircobordoni
+ * <br><br>
+ * 
  * This class provides static methods to decode JSon objects
  */
 public class DecodingUtils {

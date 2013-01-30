@@ -9,6 +9,7 @@
         android:targetSdkVersion="16" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -28,6 +29,11 @@
             android:name="com.example.exampleapp.activities.WelcomeActivity"
             android:label="@string/title_activity_welcome" >
         </activity>
+        <activity
+            android:name="com.example.exampleapp.activities.StatesDigestActivity"
+            android:label="@string/title_activity_states_digest" >
+        </activity>
+        <service android:name="com.ssmvc.ssmvc_lib.services.PersistanceService" />
     </application>
 
 </manifest>

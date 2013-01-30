@@ -1,6 +1,10 @@
 package com.example.exampleapp.utility;
 
 import java.util.HashMap;
+import java.util.Iterator;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import com.example.exampleapp.activities.MainActivity;
 
@@ -9,7 +13,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
-/*
+/**
+ * @author mircobordoni
+ * <br><br>
+ * 
  * The application needs to know information about the current Http Session. This class provides a way
  * to store these information through SharedPreferences global variables.
  */
@@ -23,11 +30,15 @@ public class SessionManager {
  
     // Context
     Context context;
+    
     private final static String LOGGED_IN = "logged_in";
     private final static String ID = "id";
     private final static String NAME = "name";
     private final static String SURNAME = "surname";
     private final static String UUID = "uuid";
+    private final static String ADMIN = "admin";
+    private final static String USER = "admin";
+
  
     public SessionManager(Context context){
         this.context = context;
@@ -38,17 +49,26 @@ public class SessionManager {
     /*
      * Create a Login session
      */
-    public void login(String id, String name, String surname, String uuid){
+    public void login(String id, String name, String surname, String uuid, JSONArray roles){
     	System.out.println("editor:"+editor);
     	editor.putBoolean(LOGGED_IN, true);
     	editor.putString(ID, id);
     	editor.putString(NAME, name);
     	editor.putString(SURNAME, surname);
     	editor.putString(UUID, uuid);
+    	for(int i=0; i<roles.length();i++){
+    		try {
+				if(roles.get(i).equals("Administrator"))editor.putBoolean(ADMIN, true);
+				else if(roles.get(i).equals("User"))editor.putBoolean(USER, true);
+			} catch (JSONException e) {
+				e.printStackTrace();
+				continue;
+			}
+    	}
     	editor.commit();
     }
     
-    /*
+    /**
      * Get user data stored during Login initialization
      */
     public HashMap<String, String> getDetails(){
@@ -60,14 +80,14 @@ public class SessionManager {
     	return map;
     }
     
-    /*
+    /**
      * Check wether the user is logged in or not
      */
     public boolean isLoggedIn(){
     	return pref.getBoolean(LOGGED_IN, false);
     }
     
-    /*
+    /**
      * Check login status. If no session exists redirect to Login Activity
      */
     public void checkLogin(){
@@ -80,7 +100,7 @@ public class SessionManager {
         }
     }
     
-    /*
+    /**
      * Destroy login session and redirect user to login activity
      */
     public void logout(){
@@ -96,6 +116,9 @@ public class SessionManager {
         context.startActivity(i);
     }
     
+    /**
+     * Get the current session UUID. 
+     */
     public String getUUID(){
     	return pref.getString(UUID, "");
     }

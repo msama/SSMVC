@@ -59,4 +59,28 @@
         android:layout_alignTop="@+id/LogoutButton"
         android:text="Update State List" />
 
+    <EditText
+        android:id="@+id/NewState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/StatesDigestButton"
+        android:layout_below="@+id/StateListSpinner"
+        android:ems="10" />
+
+    <Button
+        android:id="@+id/SendNewStateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="Send New State" />
+
+    <Button
+        android:id="@+id/DeleteAllStatesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/SendNewStateButton"
+        android:layout_centerHorizontal="true"
+        android:text="Delete All States" />
+
 </RelativeLayout>

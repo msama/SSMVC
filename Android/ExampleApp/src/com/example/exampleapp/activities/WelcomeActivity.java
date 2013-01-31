@@ -1,9 +1,13 @@
 package com.example.exampleapp.activities;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.UUID;
 
 import com.example.exampleapp.R;
+import com.example.exampleapp.dialogs.BaseDialog;
 import com.example.exampleapp.listeners.LogoutListener;
 import com.example.exampleapp.listeners.SendStateListener;
 import com.example.exampleapp.utility.SessionManager;
@@ -23,6 +27,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -68,11 +73,27 @@ public class WelcomeActivity extends Activity implements OnClickListener,
 		// Adding the proper listener to each button of the View
 		((Button) findViewById(R.id.LogoutButton))
 		.setOnClickListener(new LogoutListener(this));
-		((Button) findViewById(R.id.SendStateButton))
-				.setOnClickListener(new SendStateListener(this));
-		((Button) findViewById(R.id.StatesDigestButton))
-				.setOnClickListener(this);
+		if(!sessionManager.isAdmin()){
+			System.out.println("not admin");
+			((Button) findViewById(R.id.SendStateButton)).setVisibility(View.VISIBLE);
+			((Button) findViewById(R.id.StatesDigestButton)).setVisibility(View.VISIBLE);
+			((Button) findViewById(R.id.SendNewStateButton)).setVisibility(View.INVISIBLE);
+			((EditText) findViewById(R.id.NewState)).setVisibility(View.INVISIBLE);
+			((Button) findViewById(R.id.SendStateButton))
+			.setOnClickListener(new SendStateListener(this));
+			((Button) findViewById(R.id.StatesDigestButton))
+			.setOnClickListener(this);
+		}else{
+			((Button) findViewById(R.id.SendNewStateButton)).setVisibility(View.VISIBLE);
+			((EditText) findViewById(R.id.NewState)).setVisibility(View.VISIBLE);
+			((Button) findViewById(R.id.SendStateButton)).setVisibility(View.INVISIBLE);
+			((Button) findViewById(R.id.StatesDigestButton)).setVisibility(View.INVISIBLE);
+			((Button) findViewById(R.id.SendNewStateButton)).setOnClickListener(this);
+		}
+		
 		((Button) findViewById(R.id.UpdateStatesButton))
+		.setOnClickListener(this);
+		((Button) findViewById(R.id.DeleteAllStatesButton))
 		.setOnClickListener(this);
 	}
 
@@ -99,10 +120,28 @@ public class WelcomeActivity extends Activity implements OnClickListener,
 			Intent intent = new Intent(this, StatesDigestActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(intent);
-		}else if(v==((Button) findViewById(R.id.UpdateStatesButton))){	// Start PersistanceService getAllStates method
+		}else if(v==((Button) findViewById(R.id.UpdateStatesButton))){	// Start PersistanceService.getAllStates
+			// persistanceService needs the uuid that identifies the session
 			ArrayList<String[]> params = new ArrayList<String[]>();
 			params.add(new String[]{"uuid",sessionManager.getUUID()});
 			if(isBound)persistanceService.getAllStates(resultProcessor,params);
+		}else if(v==((Button) findViewById(R.id.SendNewStateButton))){
+			EditText newState = (EditText) findViewById(R.id.NewState);
+			if(newState.getText().equals("")){
+				BaseDialog dialog = new BaseDialog("Missing State Description", 
+						"Insert a Description for the State", this);
+			}
+			Date date= new Date();
+			Timestamp timestamp = new Timestamp(date.getTime());
+			ArrayList<String[]> p = new ArrayList<String[]>();
+			p.add(new String[]{"uuid",sessionManager.getUUID()});
+			persistanceService.insertNewState(this,UUID.randomUUID().toString(),
+					newState.getText().toString(),timestamp.toString(),p);
+		}else if(v==((Button) findViewById(R.id.DeleteAllStatesButton))){
+			dbDAO.removeAllStates();
+			ArrayList<String[]> params = new ArrayList<String[]>();
+			params.add(new String[]{"uuid",sessionManager.getUUID()});
+			persistanceService.getAllStates(resultProcessor,params);
 		}
 	}
 
@@ -135,6 +174,12 @@ public class WelcomeActivity extends Activity implements OnClickListener,
 	@Override
 	public Context getContext() {
 		return this;
+	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		unbindService(serviceConnection);
 	}
 
 	// ServiceConnection has to be implemented to manage connection to Services.

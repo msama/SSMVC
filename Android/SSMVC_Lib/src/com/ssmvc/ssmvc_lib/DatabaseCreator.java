@@ -28,12 +28,12 @@ public class DatabaseCreator extends SQLiteOpenHelper{
 	private static final String CREATE_STATE= "" +
 			"CREATE TABLE STATE(" +
 			"ID VARCHAR(40) PRIMARY KEY," +
+			"DESCRIPTION VARCHAR(100) NOT NULL," +
 			"TIME_STAMP TIMESTAMP NOT NULL,"+
-			"STATE INT NOT NULL,"+
-			"DESCRIPTION VARCHAR(100) NOT NULL" +
+			"STATE INT NOT NULL"+
 			")";
 
-	private static final int VERSION=7;
+	private static final int VERSION=8;
 	
 	public DatabaseCreator(Context context){
 		super(context, DATABASE_NAME, null, VERSION);

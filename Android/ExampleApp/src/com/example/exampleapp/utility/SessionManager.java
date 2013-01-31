@@ -37,7 +37,7 @@ public class SessionManager {
     private final static String SURNAME = "surname";
     private final static String UUID = "uuid";
     private final static String ADMIN = "admin";
-    private final static String USER = "admin";
+    private final static String USER = "user";
 
  
     public SessionManager(Context context){
@@ -56,6 +56,8 @@ public class SessionManager {
     	editor.putString(NAME, name);
     	editor.putString(SURNAME, surname);
     	editor.putString(UUID, uuid);
+    	editor.putBoolean(ADMIN, false);
+    	editor.putBoolean(USER, false);
     	for(int i=0; i<roles.length();i++){
     		try {
 				if(roles.get(i).equals("Administrator"))editor.putBoolean(ADMIN, true);
@@ -121,5 +123,9 @@ public class SessionManager {
      */
     public String getUUID(){
     	return pref.getString(UUID, "");
+    }
+    
+    public boolean isAdmin(){
+    	return pref.getBoolean(ADMIN, false);
     }
 }

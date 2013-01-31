@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.ssmvc.ssmvc_lib.dbDAO;
 import com.ssmvc.ssmvc_lib.workers.StateTableUpdater;
+import com.ssmvc.ssmvc_lib.workers.StateTableWriter;
 
 import android.app.Service;
 import android.content.Context;
@@ -27,7 +28,6 @@ public class PersistanceService extends Service{
 	@Override
 	public IBinder onBind(Intent intent) {
 		cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-		networkInfo=cm.getActiveNetworkInfo();
 		return binder;
 	}
 	
@@ -38,7 +38,9 @@ public class PersistanceService extends Service{
 	 * @param params List of params to send to the server
 	 */
 	public void getAllStates(IPersistanceCallbacks resultProcessor, ArrayList<String[]> params ){
-		if(networkInfo.isConnected()){
+		System.out.println("NetworkInfo:"+networkInfo);
+		networkInfo=cm.getActiveNetworkInfo();
+		if(networkInfo!=null){
 			String last_timestamp = dbDAO.getStateLastTimestamp();
 			String[] p = new String[]{"timestamp",last_timestamp};
 			ArrayList<String[]> paramsList = new ArrayList<String[]>();
@@ -49,9 +51,30 @@ public class PersistanceService extends Service{
 			StateTableUpdater stu = new StateTableUpdater(paramsList, resultProcessor);
 			stu.start();
 		}else{
-			resultProcessor.onPersistanceResult(dbDAO.getAllStates());
+			resultProcessor.onPersistanceResult();
 		}
 	}
+	
+	public void insertNewState(IPersistanceCallbacks resultProcessor, String id, String description,
+			String timestamp, ArrayList<String[]> params){
+		dbDAO.addState(id, description, timestamp, 1);
+		networkInfo=cm.getActiveNetworkInfo();
+		if(networkInfo!=null){
+			System.out.println("Connected");
+			ArrayList<String[]> paramsList = new ArrayList<String[]>();
+			for(String[] s:params){
+				paramsList.add(s);
+			}
+			StateTableWriter stw = new StateTableWriter(resultProcessor,paramsList);
+			stw.start();
+		}else{
+			System.out.println("Not connected");
+			resultProcessor.onPersistanceResult();
+		}
+	}
+	
+	
+	
 
 }
 

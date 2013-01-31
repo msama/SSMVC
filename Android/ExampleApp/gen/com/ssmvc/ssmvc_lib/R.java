@@ -14,6 +14,7 @@ public final class R {
 	public static final class string {
 		public static final int serverURI = 0x7f040003;
 		public static final int getNewStatesURI = 0x7f040004;
+		public static final int insertNewStatesURI = 0x7f040005;
 		public static final int app_name = 0x7f040000;
 		public static final int menu_settings = 0x7f040002;
 		public static final int hello_world = 0x7f040001;

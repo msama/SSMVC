@@ -2,10 +2,18 @@ package com.ssmvc.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.h2.util.DbDriverActivator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.ssmvc.server.dao.IStateDao;
 import com.ssmvc.server.dao.impl.StateDaoImpl;
 import com.ssmvc.server.formModel.GetNewStatesReqModel;
+import com.ssmvc.server.formModel.JSonNewStateModel;
+import com.ssmvc.server.formModel.JSonStateModel;
 import com.ssmvc.server.model.State;
 import com.ssmvc.server.utils.SessionManager;
 
@@ -89,4 +99,53 @@ public class JSonStateController {
 	}
 	
 
+	@RequestMapping(value = "/JSonInsertNewStates", method = RequestMethod.POST)
+	public void jsonAddNewStates(HttpServletResponse resp,@RequestBody JSonNewStateModel newStatesModel){
+		System.out.println("JSonInsertNewStates");
+		PrintWriter out=null;
+		resp.setCharacterEncoding("utf8");
+        resp.setContentType("application/json"); 
+        try {
+			out = resp.getWriter();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+        JSONObject obj = new JSONObject();
+        if(newStatesModel.getUuid()==null){
+        	System.out.println("uuid null");
+			obj.put("success", false);
+			out.print(obj);
+			return;
+		}else // If no session exists associated to client uuid return success=false to the client
+			if(!SessionManager.checkSession(newStatesModel.getUuid())){
+				System.out.println("session expired");
+				obj.put("success", true);
+				obj.put("loggedin", false);
+				out.print(obj);
+				return;
+		}
+        System.out.println("JSON add new state - uuid:"+newStatesModel.getUuid());
+        State s;
+        System.out.println("ricevute num rows:"+newStatesModel.getRows().size());
+        System.out.println("contenuto:\n"+newStatesModel.toString());
+        for(JSonStateModel n : newStatesModel.getRows()){
+        	System.out.println("id:"+n.getId()+" description:"+n.getDescription()+" timestamp:"+n.getTimestamp());
+        	s = new State();
+        	s.setId(n.getId());
+        	s.setDescription(n.getDescription());
+        	Date d;
+			try {
+				d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(n.getTimestamp());
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			}
+        	s.setTime_Stamp(d);
+        	stateDao.addState(s);
+        }
+        obj.put("success", true);
+        out.print(obj);
+	}
 }

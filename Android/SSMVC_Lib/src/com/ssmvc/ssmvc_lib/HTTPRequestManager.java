@@ -62,4 +62,28 @@ public class HTTPRequestManager {
 		return finalResult;
 	}
 
+	public static JSONObject sendRequest(JSONObject jsonObj, String relativeURI){
+		DefaultHttpClient client = new DefaultHttpClient();
+		JSONObject finalResult = null;
+		HttpResponse response = null;
+		HttpPost postMethod = new HttpPost(
+				context.getString(R.string.serverURI)
+						+ relativeURI);
+		try {
+			postMethod.setEntity(new ByteArrayEntity(jsonObj.toString().getBytes(
+					"UTF8")));
+			postMethod.setHeader("Content-Type", "application/json");
+			response = client.execute(postMethod);
+			finalResult=DecodingUtils.decodeJson(response.getEntity().getContent());
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return finalResult;
+	}
 }

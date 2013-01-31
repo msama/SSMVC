@@ -122,4 +122,14 @@ public class dbDAO {
 		if(!c.isAfterLast())return c.getString(c.getColumnIndex("maxTime"));
 		return null;
 	}
+	
+	public static Cursor getAllStates(int state){
+		return database.rawQuery("select * from state s where s.state='"+state+"'", null);
+	}
+	
+	public static void updateState(String id, int state){
+		ContentValues args = new ContentValues();
+	    args.put("state", String.valueOf(state));
+	    database.update("state", args, "id='" + id+"'", null);
+	}
 }

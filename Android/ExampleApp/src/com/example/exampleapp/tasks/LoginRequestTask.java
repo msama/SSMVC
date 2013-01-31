@@ -55,6 +55,7 @@ public class LoginRequestTask extends AsyncTask<Void, Void, JSONObject>{
 	@Override
 	protected void onPostExecute(JSONObject finalResult){
 		try {
+			System.out.println("finalResult:"+finalResult);
 			if (finalResult != null) {
 				// If the user has provided correct credentials start the WelcomeActivity
 				

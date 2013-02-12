@@ -81,12 +81,21 @@ public class StateDaoImpl implements IStateDao{
 		Date date= new Date();
 		Timestamp timestamp = new Timestamp(date.getTime());
 		sd.setTime_Date(timestamp);
+		sd.setTime_Stamp(timestamp);
 		session.saveOrUpdate(sd);
 		tx.commit();
 		session.close();
 	}
+	
+	public void addStateDetails(State_Details state_details){
+		session=sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		session.saveOrUpdate(state_details);
+		tx.commit();
+		session.close();
+	}
 
-	public List<State_Details> getStateDetails() {
+	public List<State_Details> getAllStateDetails() {
 		session=sessionFactory.openSession();
 		Transaction tx=session.beginTransaction();
 		Query q=session.getNamedQuery("StateDetails.getStateDetails");
@@ -96,12 +105,37 @@ public class StateDaoImpl implements IStateDao{
 		return sd;
 	}
 
-	public List<State> getStatesFrom(String timestamp) {
+	public List<State> getStatesFromTimestamp(String timestamp) {
 		session=sessionFactory.openSession();
 		Transaction tx=session.beginTransaction();
 		Query q=session.getNamedQuery("State.getStatesFromTimestamp");
 		q.setString("timestamp", timestamp);
 		List<State> res = q.list();
+		tx.commit();
+		session.close();
+		return res;
+	}
+
+	@Override
+	public List<State_Details> getStateDetailsByIdFromTimestamp(String user_id, String timestamp) {
+		session=sessionFactory.openSession();
+		Transaction tx=session.beginTransaction();
+		Query q=session.getNamedQuery("StateDetails.getStateDetailsByIdFromTimestamp");
+		q.setString("timestamp", timestamp);
+		q.setString("user_id", user_id);
+		List<State_Details> res = q.list();
+		tx.commit();
+		session.close();
+		return res;
+	}
+
+	@Override
+	public List<State_Details> getAllStateDetailsByUserId(String user_id) {
+		session=sessionFactory.openSession();
+		Transaction tx=session.beginTransaction();
+		Query q=session.getNamedQuery("StateDetails.getStateDetailsByUserId");
+		q.setString("user_id", user_id);
+		List<State_Details> res = q.list();
 		tx.commit();
 		session.close();
 		return res;

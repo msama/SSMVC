@@ -23,13 +23,13 @@ import android.content.SharedPreferences.Editor;
 public class SessionManager {
 	
 	// Shared Preferences
-    SharedPreferences pref;
+    private static SharedPreferences pref;
  
     // Editor for Shared preferences
-    Editor editor;
+    private static Editor editor;
  
     // Context
-    Context context;
+    private static Context context;
     
     private final static String LOGGED_IN = "logged_in";
     private final static String ID = "id";
@@ -49,7 +49,7 @@ public class SessionManager {
     /*
      * Create a Login session
      */
-    public void login(String id, String name, String surname, String uuid, JSONArray roles){
+    public static void login(String id, String name, String surname, String uuid, JSONArray roles){
     	System.out.println("editor:"+editor);
     	editor.putBoolean(LOGGED_IN, true);
     	editor.putString(ID, id);
@@ -73,7 +73,7 @@ public class SessionManager {
     /**
      * Get user data stored during Login initialization
      */
-    public HashMap<String, String> getDetails(){
+    public static HashMap<String, String> getDetails(){
     	HashMap<String, String> map = new HashMap<String, String>();
     	map.put(ID, pref.getString(ID,""));
     	map.put(NAME, pref.getString(NAME, ""));
@@ -85,14 +85,14 @@ public class SessionManager {
     /**
      * Check wether the user is logged in or not
      */
-    public boolean isLoggedIn(){
+    public static boolean isLoggedIn(){
     	return pref.getBoolean(LOGGED_IN, false);
     }
     
     /**
      * Check login status. If no session exists redirect to Login Activity
      */
-    public void checkLogin(){
+    public static void checkLogin(){
     	// Check login status
         if(!isLoggedIn()){
             Intent i = new Intent(context, MainActivity.class);
@@ -105,7 +105,7 @@ public class SessionManager {
     /**
      * Destroy login session and redirect user to login activity
      */
-    public void logout(){
+    public static void logout(){
     	editor.clear();
     	editor.commit();
     	
@@ -121,11 +121,23 @@ public class SessionManager {
     /**
      * Get the current session UUID. 
      */
-    public String getUUID(){
+    public static String getUUID(){
     	return pref.getString(UUID, "");
     }
     
-    public boolean isAdmin(){
+    /**
+     * Get the current user ID
+     * @return
+     */
+    public static String getUserId(){
+    	return pref.getString(ID, "");
+    }
+    
+    /**
+     * Check if the currend logged in user is an Administrator
+     * @return true if the user is an Admin, false otherwise
+     */
+    public static boolean isAdmin(){
     	return pref.getBoolean(ADMIN, false);
     }
 }

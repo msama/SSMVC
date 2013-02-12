@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ssmvc.server.dao.IStateDao;
 import com.ssmvc.server.dao.impl.StateDaoImpl;
-import com.ssmvc.server.formModel.GetNewStatesReqModel;
+import com.ssmvc.server.formModel.JSonGetNewStatesReqModel;
 import com.ssmvc.server.formModel.JSonNewStateModel;
 import com.ssmvc.server.formModel.JSonStateModel;
 import com.ssmvc.server.model.State;
@@ -38,12 +38,12 @@ public class JSonStateController {
 	/**
 	 * Controller used to manage State table synchronization. The client can use the URI /JSonGetNewStates to fetch
 	 * new States inserted in the State table from a certain timestamp on. The client has to provide its uuid (the 
-	 * session identifier) and the last timestamp in its State table.
+	 * session identifier) and the last timestamp in its local STATE table.
 	 * @param resp HTTP response
 	 * @param newStatesReqModel Object that will contain client uuid and latest timestamp
 	 */
 	@RequestMapping(value = "/JSonGetNewStates", method = RequestMethod.POST)
-	public void jsonGetNewStates(HttpServletResponse resp,@RequestBody GetNewStatesReqModel newStatesReqModel){
+	public void jsonGetNewStates(HttpServletResponse resp,@RequestBody JSonGetNewStatesReqModel newStatesReqModel){
 		PrintWriter out=null;
 		resp.setCharacterEncoding("utf8");
         resp.setContentType("application/json"); 
@@ -61,8 +61,7 @@ public class JSonStateController {
 			return;
 		}else // If no session exists associated to client uuid return success=false to the client
 			if(!SessionManager.checkSession(newStatesReqModel.getUuid())){
-				obj.put("success", true);
-				obj.put("loggedin", false);
+				obj.put("success", false);
 				out.print(obj);
 				return;
 		}
@@ -74,7 +73,7 @@ public class JSonStateController {
 			states = stateDao.getAllStates();	// get all records from State table
 		}else{
 			// else get records from State table having timestamp > latest client timestamp
-			states= stateDao.getStatesFrom(newStatesReqModel.getTimestamp());
+			states= stateDao.getStatesFromTimestamp(newStatesReqModel.getTimestamp());
 		}
 		
 		// Add each record to a JSon Object
@@ -99,6 +98,13 @@ public class JSonStateController {
 	}
 	
 
+	/**
+	 * Controller used to manage the insertion of new records in the State table. Each record sent by the client
+	 * is stored in the State table and, if everything works as expected, the client receives a positive acknowledge.
+	 * 
+	 * @param resp HTTP response
+	 * @param newStatesModel Object that will contain client's uuid and the list of records to be inserted
+	 */
 	@RequestMapping(value = "/JSonInsertNewStates", method = RequestMethod.POST)
 	public void jsonAddNewStates(HttpServletResponse resp,@RequestBody JSonNewStateModel newStatesModel){
 		System.out.println("JSonInsertNewStates");
@@ -120,8 +126,7 @@ public class JSonStateController {
 		}else // If no session exists associated to client uuid return success=false to the client
 			if(!SessionManager.checkSession(newStatesModel.getUuid())){
 				System.out.println("session expired");
-				obj.put("success", true);
-				obj.put("loggedin", false);
+				obj.put("success", false);
 				out.print(obj);
 				return;
 		}
@@ -138,8 +143,9 @@ public class JSonStateController {
 			try {
 				d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(n.getTimestamp());
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				obj.put("success", false);
+		        out.print(obj);
+		        e.printStackTrace();
 				return;
 			}
         	s.setTime_Stamp(d);

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.ssmvc.server.dao.IStateDao;
 import com.ssmvc.server.dao.IUserDao;
@@ -25,7 +26,7 @@ import com.ssmvc.server.utils.SessionManager;
 import com.ssmvc.server.utils.Utility;
 
 @Controller
-@SessionAttributes({"uuid","loggedIn"})
+@SessionAttributes({"uuid"})
 public class WebLoginController {
 
 	@Autowired
@@ -35,20 +36,18 @@ public class WebLoginController {
 	private IStateDao stateDao;
 	
 	@RequestMapping(value = "/WebLogin", method = RequestMethod.GET)
-	public String WebLoginGet(Locale locale, Model model) {
-		model.addAttribute("loggedIn", "false");
+	public String WebLoginGet( Model model) {
 		return "login";
 	}
 	
 	
 	@RequestMapping(value = "/WebLogin", method = RequestMethod.POST)
-	public String WebLoginPost(ModelMap model, @ModelAttribute("loginmodel") loginModel loginM,
+	public ModelAndView WebLoginPost(ModelMap model, @ModelAttribute("loginmodel") loginModel loginM,
 			SessionStatus sessionStatus) {
 		System.out.println("user:"+loginM.getUsername());
 		System.out.println("Pass:"+loginM.getPassword());
-		List<State> stateList = stateDao.getAllStates();
-		model.put("StateList", stateList);
 		loginResponse response=userDao.checkCredentials(loginM.getUsername(), loginM.getPassword());
+		ModelAndView modelAndView=new ModelAndView("login");
 		if(response.isSuccess()){
 			Iterator<User_Role> userRoleIterator = response.getUserRoleSet().iterator();
 			User_Role userRole;
@@ -56,31 +55,41 @@ public class WebLoginController {
 				userRole=userRoleIterator.next();
 				if(userRole.getRole().getDescription().equals("Administrator")){
 					System.out.println("ADMIN");
-					model.addAttribute("Admin",true);
-					model.put("deleteStateModel", new StateFormModel());
+					modelAndView = new ModelAndView("redirect:Admin");
 				}else if(userRole.getRole().getDescription().equals("User")){
-					model.put("sendStateModel", new StateFormModel());
+					modelAndView = new ModelAndView("redirect:User");
 				}
 			}
 			String sess = Utility.generateUUID();
-			model.put("uuid", sess);
+			modelAndView.addObject("uuid", sess);
 			SessionManager.createNewSession(sess, response.getID());
 			System.out.println("GENERATED:"+sess);
 			System.out.println(SessionManager.sessionToString());
-			
-			return "welcome";
+			return modelAndView;
 		}
 		else{
-			model.addAttribute("Result", "Wrong Username or Password!");
+			modelAndView = new ModelAndView("login");
+			modelAndView.addObject("Result", "Wrong Username or Password!");
 			System.out.println(SessionManager.sessionToString());
-			return "login";
+			return modelAndView;
 		}
 	}
 	
 	
-	@RequestMapping(value = "/testSession", method = RequestMethod.GET)
-	public String testSession(Model model,@ModelAttribute(value="uuid") String sess) {
-		System.out.println("SESSION:"+sess);
+	@RequestMapping(value = "/User", method = RequestMethod.GET)
+	public String userLogin(ModelMap model) {
+		List<State> stateList = stateDao.getAllStates();
+		model.put("StateList", stateList);
+		model.put("sendStateModel", new StateFormModel());
+		return "welcome";
+	}
+	
+	@RequestMapping(value = "/Admin", method = RequestMethod.GET)
+	public String adminLogin(ModelMap model) {
+		List<State> stateList = stateDao.getAllStates();
+		model.put("StateList", stateList);
+		model.addAttribute("Admin",true);
+		model.put("deleteStateModel", new StateFormModel());
 		return "welcome";
 	}
 	

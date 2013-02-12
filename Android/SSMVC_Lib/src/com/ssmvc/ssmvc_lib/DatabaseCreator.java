@@ -20,7 +20,7 @@ public class DatabaseCreator extends SQLiteOpenHelper{
 			"USER_ID INT NOT NULL," +
 			"TIME_DATE TIMESTAMP NOT NULL," +
 			"STATE_ID VARCHAR(40) NOT NULL," +
-			"VERSION INT NOT NULL,"+
+			"TIME_STAMP TIMESTAMP NOT NULL,"+
 			"STATE INT NOT NULL,"+
 			"PRIMARY KEY (TIME_DATE,STATE_ID,USER_ID)," +
 			"CONSTRAINT FK_STATE_ID FOREIGN KEY (STATE_ID) REFERENCES STATE (ID))";
@@ -33,7 +33,7 @@ public class DatabaseCreator extends SQLiteOpenHelper{
 			"STATE INT NOT NULL"+
 			")";
 
-	private static final int VERSION=8;
+	private static final int VERSION=10;
 	
 	public DatabaseCreator(Context context){
 		super(context, DATABASE_NAME, null, VERSION);
@@ -50,7 +50,6 @@ public class DatabaseCreator extends SQLiteOpenHelper{
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// TODO Auto-generated method stub
 		System.out.println("Update");
 		db.execSQL("DROP TABLE STATE");
 		db.execSQL("DROP TABLE STATE_DETAILS");

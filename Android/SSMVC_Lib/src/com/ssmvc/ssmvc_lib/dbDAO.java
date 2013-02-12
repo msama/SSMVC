@@ -24,15 +24,7 @@ public class dbDAO {
 		//this.context = context;
 		database=dbCreator.getWritableDatabase();
 	}
-	
-	public static void open(){
-		database=dbCreator.getWritableDatabase();
-	}
-	
-	public static void close(){
-		dbCreator.close();
-	}
-	
+
 	public static void initStates(){
 		ContentValues content = new ContentValues();
 		Date date= new Date();
@@ -41,7 +33,7 @@ public class dbDAO {
 		content.put("ID", 2);
 		content.put("STATE", 1);
 		content.put("TIME_STAMP", timestamp.toString());
-		long l =database.insert("STATE", null, content);
+		database.insert("STATE", null, content);
 		
 	}
 	
@@ -49,14 +41,14 @@ public class dbDAO {
 	 * Delete all records from table STATE
 	 */
 	public static void removeAllStates(){
-		int i=database.delete("STATE", null, null);
+		database.delete("STATE", null, null);
 	}
 	
 	/**
 	 * Delete all records from table STATE_DETAILS
 	 */
 	public static void removeStatesDetails(){
-		int i = database.delete("STATE_DETAILS", null, null);
+		database.delete("STATE_DETAILS", null, null);
 	}
 	
 	/**
@@ -73,6 +65,25 @@ public class dbDAO {
 		content.put("TIME_STAMP", timestamp);
 		content.put("STATE", state);
 		long l =database.insert("STATE", null, content);
+		System.out.println("Inserted, id="+l);
+	}
+	
+	/**
+	 * Add a new record to the table STATE_DETAILS
+	 * 
+	 * @param user_id Unique identifier of the user
+	 * @param state_id Unique identifier of the state
+	 * @param timestamp timestamp of the new record
+	 * @param state Current state of the record
+	 */
+	public static void addStateDetails(String user_id, String state_id, String timestamp, int state){
+		ContentValues content = new ContentValues();
+		content.put("USER_ID", user_id);
+		content.put("STATE_ID", state_id);
+		content.put("TIME_STAMP", timestamp);
+		content.put("TIME_DATE", timestamp);
+		content.put("STATE", state);
+		long l = database.insert("STATE_DETAILS", null, content);
 		System.out.println("Inserted, id="+l);
 	}
 	
@@ -123,13 +134,44 @@ public class dbDAO {
 		return null;
 	}
 	
+	/**
+	 * Get all records from table STATE where the current state is equal to the parameter passed
+	 * @param state current state of the record that has to be read
+	 * @return records with current state equals to the parameter passed
+	 */
 	public static Cursor getAllStates(int state){
 		return database.rawQuery("select * from state s where s.state='"+state+"'", null);
+	}
+	
+	/**
+	 * Get all records from table STATE_DETAILS where the current state is equal to the parameter passed
+	 * @param state current state of the record that has to be read
+	 * @return records with current state equals to the parameter passed
+	 */
+	public static Cursor getAllStateDetails(int state){
+		return database.rawQuery("select * from state_details sd where sd.state='"+state+"'", null);
 	}
 	
 	public static void updateState(String id, int state){
 		ContentValues args = new ContentValues();
 	    args.put("state", String.valueOf(state));
 	    database.update("state", args, "id='" + id+"'", null);
+	}
+
+	public static void updateStateDetails(String user_id, String state_id,
+			String time_date, int state) {
+		ContentValues args = new ContentValues();
+		args.put("state", String.valueOf(state));
+		database.update("state_details", args, "user_id='"+user_id+"' and state_id='"+state_id+"' and time_date='"+time_date+"'", 
+				null);
+		
+	}
+
+	public static String getStateDetailsLastTimestamp(String user_id) {
+		Cursor c = database.rawQuery("select max(sd.time_stamp) as maxTime from state_details sd where sd.user_id='"+user_id+"'", null);
+		if(c==null)return null;
+		c.moveToFirst();
+		if(!c.isAfterLast())return c.getString(c.getColumnIndex("maxTime"));
+		return null;
 	}
 }

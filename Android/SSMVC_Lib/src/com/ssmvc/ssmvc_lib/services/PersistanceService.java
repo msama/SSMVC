@@ -3,6 +3,8 @@ package com.ssmvc.ssmvc_lib.services;
 import java.util.ArrayList;
 
 import com.ssmvc.ssmvc_lib.dbDAO;
+import com.ssmvc.ssmvc_lib.workers.StateDetailsTableUpdater;
+import com.ssmvc.ssmvc_lib.workers.StateDetailsTableWriter;
 import com.ssmvc.ssmvc_lib.workers.StateTableUpdater;
 import com.ssmvc.ssmvc_lib.workers.StateTableWriter;
 
@@ -38,42 +40,77 @@ public class PersistanceService extends Service{
 	 * @param params List of params to send to the server
 	 */
 	public void getAllStates(IPersistanceCallbacks resultProcessor, ArrayList<String[]> params ){
-		System.out.println("NetworkInfo:"+networkInfo);
 		networkInfo=cm.getActiveNetworkInfo();
 		if(networkInfo!=null){
 			String last_timestamp = dbDAO.getStateLastTimestamp();
 			String[] p = new String[]{"timestamp",last_timestamp};
-			ArrayList<String[]> paramsList = new ArrayList<String[]>();
-			paramsList.add(p);
-			for(String[] s:params){
-				paramsList.add(s);
-			}
-			StateTableUpdater stu = new StateTableUpdater(paramsList, resultProcessor);
+			params.add(p);
+			StateTableUpdater stu = new StateTableUpdater(params, resultProcessor);
 			stu.start();
 		}else{
 			resultProcessor.onPersistanceResult();
 		}
 	}
 	
+	/**
+	 * This method is used to insert a new record into the local STATE table. If a network connection is available
+	 * it pushes the inserted records to the remote database.
+	 * 
+	 * @param resultProcessor Object that will handle the results of this method
+	 * @param id Unique identifier of the new record
+	 * @param description Description field of the new record
+	 * @param timestamp timestamp of the new record
+	 * @param params list of application specific parameters to be sent to the server
+	 */
 	public void insertNewState(IPersistanceCallbacks resultProcessor, String id, String description,
 			String timestamp, ArrayList<String[]> params){
 		dbDAO.addState(id, description, timestamp, 1);
 		networkInfo=cm.getActiveNetworkInfo();
 		if(networkInfo!=null){
-			System.out.println("Connected");
-			ArrayList<String[]> paramsList = new ArrayList<String[]>();
-			for(String[] s:params){
-				paramsList.add(s);
-			}
-			StateTableWriter stw = new StateTableWriter(resultProcessor,paramsList);
+			StateTableWriter stw = new StateTableWriter(resultProcessor,params);
 			stw.start();
 		}else{
-			System.out.println("Not connected");
 			resultProcessor.onPersistanceResult();
 		}
 	}
 	
 	
+	/**
+	 * This method is used to insert a new record into the local STATE_DETAILS table. If a network connection is available
+	 * it pushes the inserted records to the remote database.
+	 * @param resultProcessor Object that will handle the results of this method
+	 * @param user_id Unique identifier of the user
+	 * @param state_id Unique identifier of the state
+	 * @param timestamp timestamp of the new record
+	 * @param params list of application specific parameters to be sent to the server
+	 */
+	public void insertNewStateDetails(IPersistanceCallbacks resultProcessor, String user_id, String state_id,
+			String timestamp, ArrayList<String[]> params){
+		dbDAO.addStateDetails(user_id, state_id, timestamp, 1);
+		networkInfo=cm.getActiveNetworkInfo();
+		if(networkInfo!=null){
+			StateDetailsTableWriter sdtw = new StateDetailsTableWriter(resultProcessor,params);
+			sdtw.start();
+		}else{
+			resultProcessor.onPersistanceResult();
+		}
+	}
+	
+	
+	public void getAllStateDetails(IPersistanceCallbacks resultProcessor, ArrayList<String[]> params, String user_id){
+		networkInfo=cm.getActiveNetworkInfo();
+		if(networkInfo!=null){
+			String last_timestamp = dbDAO.getStateDetailsLastTimestamp(user_id);
+			String[] p = new String[]{"timestamp",last_timestamp};
+			params.add(p);
+			p = new String[]{"user_id",user_id};
+			params.add(p);
+			StateDetailsTableUpdater sdtu = new StateDetailsTableUpdater(params, resultProcessor);
+			sdtu.start();
+		}else{
+			resultProcessor.onPersistanceResult();
+		}
+	}
 	
 
 }

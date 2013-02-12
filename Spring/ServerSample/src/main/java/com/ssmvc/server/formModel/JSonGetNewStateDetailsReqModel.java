@@ -1,9 +1,11 @@
 package com.ssmvc.server.formModel;
 
-public class GetNewStatesReqModel {
+public class JSonGetNewStateDetailsReqModel {
 
 	private String uuid;
 	private String timestamp;
+	private String user_id;
+	
 	public String getUuid() {
 		return uuid;
 	}
@@ -16,6 +18,10 @@ public class GetNewStatesReqModel {
 	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
 	}
-	
-	
+	public String getUser_id() {
+		return user_id;
+	}
+	public void setUser_id(String user_id) {
+		this.user_id = user_id;
+	}
 }

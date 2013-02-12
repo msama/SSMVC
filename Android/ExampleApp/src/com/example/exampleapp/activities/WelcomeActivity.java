@@ -9,7 +9,6 @@ import java.util.UUID;
 import com.example.exampleapp.R;
 import com.example.exampleapp.dialogs.BaseDialog;
 import com.example.exampleapp.listeners.LogoutListener;
-import com.example.exampleapp.listeners.SendStateListener;
 import com.example.exampleapp.utility.SessionManager;
 import com.ssmvc.ssmvc_lib.*;
 import com.ssmvc.ssmvc_lib.services.*;
@@ -42,7 +41,6 @@ import android.widget.TextView;
 public class WelcomeActivity extends Activity implements OnClickListener,
 		IPersistanceCallbacks {
 
-	private SessionManager sessionManager;
 	private PersistanceService persistanceService;
 	private IPersistanceCallbacks resultProcessor = this;
 	private boolean isBound;
@@ -57,30 +55,25 @@ public class WelcomeActivity extends Activity implements OnClickListener,
 		TextView detailsTextView = (TextView) findViewById(R.id.DetailsTextView);
 		
 		// Create a new Session manager
-		sessionManager = new SessionManager(getApplicationContext());
-		sessionManager.checkLogin();
-		
-		HashMap<String, String> details = sessionManager.getDetails();
+		SessionManager.checkLogin();
+		dbDAO.removeStatesDetails();
+		HashMap<String, String> details = SessionManager.getDetails();
 		detailsTextView.setText("Welcome " + details.get("name") + " "
 				+ details.get("surname"));
-
-//		 dbDAO.removeAllStates();
 		
 		// Bind this Activity to Persistance Service
 		Intent intent = new Intent(this, PersistanceService.class);
 		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
 
-		// Adding the proper listener to each button of the View
-		((Button) findViewById(R.id.LogoutButton))
-		.setOnClickListener(new LogoutListener(this));
-		if(!sessionManager.isAdmin()){
-			System.out.println("not admin");
+		System.out.println("persistanceService="+persistanceService);
+		// Selecting which view component will be visible or not, depending on user Role
+		if(!SessionManager.isAdmin()){
 			((Button) findViewById(R.id.SendStateButton)).setVisibility(View.VISIBLE);
 			((Button) findViewById(R.id.StatesDigestButton)).setVisibility(View.VISIBLE);
 			((Button) findViewById(R.id.SendNewStateButton)).setVisibility(View.INVISIBLE);
 			((EditText) findViewById(R.id.NewState)).setVisibility(View.INVISIBLE);
 			((Button) findViewById(R.id.SendStateButton))
-			.setOnClickListener(new SendStateListener(this));
+			.setOnClickListener(this);
 			((Button) findViewById(R.id.StatesDigestButton))
 			.setOnClickListener(this);
 		}else{
@@ -91,10 +84,14 @@ public class WelcomeActivity extends Activity implements OnClickListener,
 			((Button) findViewById(R.id.SendNewStateButton)).setOnClickListener(this);
 		}
 		
+		// Adding the proper listener to each button of the View
+		((Button) findViewById(R.id.LogoutButton))
+		.setOnClickListener(new LogoutListener(this));
 		((Button) findViewById(R.id.UpdateStatesButton))
 		.setOnClickListener(this);
 		((Button) findViewById(R.id.DeleteAllStatesButton))
 		.setOnClickListener(this);
+		
 	}
 
 	
@@ -116,14 +113,13 @@ public class WelcomeActivity extends Activity implements OnClickListener,
 	 */
 	@Override
 	public void onClick(View v) {
+		ArrayList<String[]> params = new ArrayList<String[]>();
+		params.add(new String[]{"uuid",SessionManager.getUUID()});
 		if(v==((Button) findViewById(R.id.StatesDigestButton))){ // Start StatesDigestActivity
 			Intent intent = new Intent(this, StatesDigestActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(intent);
 		}else if(v==((Button) findViewById(R.id.UpdateStatesButton))){	// Start PersistanceService.getAllStates
-			// persistanceService needs the uuid that identifies the session
-			ArrayList<String[]> params = new ArrayList<String[]>();
-			params.add(new String[]{"uuid",sessionManager.getUUID()});
 			if(isBound)persistanceService.getAllStates(resultProcessor,params);
 		}else if(v==((Button) findViewById(R.id.SendNewStateButton))){
 			EditText newState = (EditText) findViewById(R.id.NewState);
@@ -133,15 +129,21 @@ public class WelcomeActivity extends Activity implements OnClickListener,
 			}
 			Date date= new Date();
 			Timestamp timestamp = new Timestamp(date.getTime());
-			ArrayList<String[]> p = new ArrayList<String[]>();
-			p.add(new String[]{"uuid",sessionManager.getUUID()});
 			persistanceService.insertNewState(this,UUID.randomUUID().toString(),
-					newState.getText().toString(),timestamp.toString(),p);
+					newState.getText().toString(),timestamp.toString(),params);
 		}else if(v==((Button) findViewById(R.id.DeleteAllStatesButton))){
 			dbDAO.removeAllStates();
-			ArrayList<String[]> params = new ArrayList<String[]>();
-			params.add(new String[]{"uuid",sessionManager.getUUID()});
 			persistanceService.getAllStates(resultProcessor,params);
+		}else if(v==((Button) findViewById(R.id.SendStateButton))){
+			Spinner spinner = (Spinner)findViewById(R.id.StateListSpinner);;
+			Cursor item = (Cursor) spinner.getSelectedItem();
+			String state_id=item.getString(item.getColumnIndex("_id"));
+			System.out.println("state_id="+state_id);
+			Date date= new Date();
+			Timestamp timestamp = new Timestamp(date.getTime());
+			
+			persistanceService.insertNewStateDetails(this, 
+					SessionManager.getUserId(), state_id, timestamp.toString(), params);
 		}
 	}
 
@@ -190,7 +192,7 @@ public class WelcomeActivity extends Activity implements OnClickListener,
 			PersistanceLocalBinder binder = (PersistanceLocalBinder) service;
 			persistanceService = (PersistanceService) binder.getService();
 			ArrayList<String[]> params = new ArrayList<String[]>();
-			params.add(new String[]{"uuid",sessionManager.getUUID()});
+			params.add(new String[]{"uuid",SessionManager.getUUID()});
 			// Call persistance service method to update local states with new ones from server
 			persistanceService.getAllStates(resultProcessor,params);
 			isBound = true;

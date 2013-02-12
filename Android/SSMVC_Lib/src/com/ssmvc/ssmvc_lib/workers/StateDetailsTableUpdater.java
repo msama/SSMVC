@@ -13,26 +13,19 @@ import com.ssmvc.ssmvc_lib.R;
 import com.ssmvc.ssmvc_lib.dbDAO;
 import com.ssmvc.ssmvc_lib.services.IPersistanceCallbacks;
 
-/**
- * 
- * @author mircobordoni
- * <br><br>
- * Thread used to asynchronously send an HTTP request to the server and process the response.
- * This thread gets new records from the remote table STATE and insert them in the local table STATE.
- */
-public class StateTableUpdater extends Thread{
-	
+public class StateDetailsTableUpdater extends Thread{
+
 	private IPersistanceCallbacks resultProcessor;
 	private ArrayList<String[]> paramsList;
 	
-	public StateTableUpdater(ArrayList<String[]> paramsList,IPersistanceCallbacks resultProcessor){
+	public StateDetailsTableUpdater(ArrayList<String[]> paramsList,IPersistanceCallbacks resultProcessor){
 		this.paramsList=paramsList;
 		this.resultProcessor=resultProcessor;
 	}
 	
 	public void run(){
 		Context context=resultProcessor.getContext();
-		JSONObject result = HTTPRequestManager.sendRequest(paramsList,context.getString(R.string.getNewStatesURI));
+		JSONObject result = HTTPRequestManager.sendRequest(paramsList,context.getString(R.string.getNewStateDetailsURI));
 		if(result.length()!=0){
 			System.out.println("result length="+result.length());
 			try {
@@ -42,7 +35,7 @@ public class StateTableUpdater extends Thread{
 				for(int i=0; i<rows.length();i++){
 					record = rows.getJSONObject(i);
 					System.out.println("ROW:"+rows.get(i));
-					dbDAO.addState(record.getString("ID"), record.getString("DESCRIPTION"), 
+					dbDAO.addStateDetails(record.getString("USER_ID"),record.getString("STATE_ID"), 
 							record.getString("TIME_STAMP"), 0);
 				}
 				resultProcessor.onPersistanceResult();
@@ -52,5 +45,4 @@ public class StateTableUpdater extends Thread{
 			}
 		}
 	}
-
 }

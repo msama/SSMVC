@@ -10,7 +10,15 @@ import javax.persistence.*;
 @Table(name="state_details")
 @NamedQueries({
 	@NamedQuery(name="StateDetails.getStateDetails",
-			query="select sd from State_Details sd left join fetch sd.state left join fetch sd.user")
+			query="select sd from State_Details sd left join fetch sd.state left join fetch sd.user"),
+	@NamedQuery(name="StateDetails.getStateDetailsByUserId",
+	query="select sd from State_Details sd left join fetch sd.user where user_id=:user_id"),
+	@NamedQuery(name="StateDetails.getStateDetailsFromTimestamp",
+	query="select distinct sd from State_Details sd left join fetch sd.state left join fetch sd.user " +
+			"where time_stamp>:timestamp"),
+	@NamedQuery(name="StateDetails.getStateDetailsByIdFromTimestamp",
+	query="select distinct sd from State_Details sd " +
+			"where time_stamp>:timestamp and user_id=:user_id")
 })
 public class State_Details implements Serializable{
 	
@@ -19,7 +27,7 @@ public class State_Details implements Serializable{
 	private String State_Id;
 	private User user;
 	private State state;
-	private int version;
+	private Date time_stamp;
 
 	@Id
     @AttributeOverrides({
@@ -83,14 +91,16 @@ public class State_Details implements Serializable{
 				" Date:"+this.Time_Date;
 	}
 	
-	@Column(name = "VERSION")
-	public int getVersion() {
-		return version;
+	@Column(name="TIME_STAMP")
+	public Date getTime_Stamp(){
+		return time_stamp;
 	}
-
-	public void setVersion(int version) {
-		this.version = version;
+	
+	public void setTime_Stamp(Date time_stamp){
+		this.time_stamp=time_stamp;
 	}
+	
+	
 }
 
 

@@ -13,10 +13,16 @@ public interface IStateDao {
 	public void deleteState(State state);
 	
 	public void addState(State state);
+	
+	public void addStateDetails(State_Details state_details);
 
 	public void addStateDetails(State s, long userId);
 	
-	public List<State_Details> getStateDetails();
+	public List<State_Details> getAllStateDetails();
 	
-	public List<State> getStatesFrom(String timestamp);
+	public List<State_Details> getAllStateDetailsByUserId(String user_id);
+	
+	public List<State> getStatesFromTimestamp(String timestamp);
+	
+	public List<State_Details> getStateDetailsByIdFromTimestamp(String user_id,String timestamp);
 }

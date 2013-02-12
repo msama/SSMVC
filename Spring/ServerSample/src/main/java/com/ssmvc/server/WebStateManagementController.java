@@ -22,7 +22,7 @@ import com.ssmvc.server.utils.SessionManager;
 
 @Controller
 @SessionAttributes({"uuid"})
-public class StateManagementController {
+public class WebStateManagementController {
 	
 	@Autowired
 	private IStateDao stateDao;
@@ -145,7 +145,7 @@ public class StateManagementController {
 			model.put("Success", "Session Expired. Please Log In again!");
 			return "login";
 		}
-		List<State_Details> stateDetails = stateDao.getStateDetails();
+		List<State_Details> stateDetails = stateDao.getAllStateDetails();
 		List<State_Details> resultStates = new LinkedList<State_Details>() ;
 		long userid=SessionManager.getUserId(sess);
 		for(State_Details sd:stateDetails){

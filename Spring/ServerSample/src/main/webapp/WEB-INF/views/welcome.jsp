@@ -51,7 +51,6 @@
 		</c:when>
 	</c:choose>
 
-	<a href="/server/testSession">test</a>
 	
 	<br><br>
 	<c:choose>

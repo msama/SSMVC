@@ -36,7 +36,7 @@ public class JSonLoginController {
 	private IUserDao userDao;
 	
 	@RequestMapping( value = "/loginJson",method = RequestMethod.POST)
-	public /*@ResponseBody loginResponse*/ void JsonLogin(HttpServletResponse resp,@RequestBody loginModel login) {
+	public void JsonLogin(HttpServletResponse resp,@RequestBody loginModel login) {
 		loginResponse response=userDao.checkCredentials(login.getUsername(),login.getPassword());
 		System.out.println("Result="+response.isSuccess());
 		System.out.println("Received:"+login.getUsername()+" "+login.getPassword());

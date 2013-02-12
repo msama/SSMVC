@@ -20,7 +20,6 @@ import javax.persistence.*;;
 public class State implements Serializable{
 	private String id;
 	private String description;
-	//private int version;
 	private Date time_stamp;
 
 	private Set<State_Details> stateDetails = new HashSet<State_Details>();
@@ -63,14 +62,6 @@ public class State implements Serializable{
 		getStateDetails().remove(stateDetails);
 	}
 	
-//	@Column(name="VERSION")
-//	public int getVersion() {
-//		return version;
-//	}
-//
-//	public void setVersion(int version) {
-//		this.version = version;
-//	}
 	
 	@Column(name="TIME_STAMP")
 	public Date getTime_Stamp(){

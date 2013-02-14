@@ -1,6 +1,9 @@
 package com.ssmvc.server.dao.impl;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +24,7 @@ public class StateDaoImpl implements IStateDao{
 	
 	private Session session;
 	private SessionFactory sessionFactory;
+	private Transaction tx;
 	
 	@Resource(name = "sessionFactory")
 	public void setSessionFactory(SessionFactory sessionFactory) {
@@ -34,18 +38,15 @@ public class StateDaoImpl implements IStateDao{
 	@Transactional(readOnly = true)
 	public List<State> getAllStates() {
 		List<State> l;
-		session=sessionFactory.openSession();
+		openSession();
 		l= (List<State>)session.getNamedQuery("State.getAllStates").list();
-		session.close();
+		closeSession();
 		return l;
 	}
 
 	@Transactional(readOnly = false)
 	public void deleteState(State state) {
-		System.out.println("id:"+state.getId());
-		System.out.println("state_details:"+state.getStateDetails());
-		session=sessionFactory.openSession();
-		Transaction tx=session.beginTransaction();
+		openSession();
 		Query query = session.createQuery("delete from State_Details where state_id=:state_id");
 		query.setString("state_id", state.getId());
 		int rowcount=query.executeUpdate();
@@ -54,27 +55,23 @@ public class StateDaoImpl implements IStateDao{
 		query.setString("state_id", state.getId());
 		rowcount=query.executeUpdate();
 		System.out.println("Rows affected in state="+rowcount);
-		tx.commit();
-		session.close();
+		closeSession();
 	}
 
 	@Transactional(readOnly = false)
 	public void addState(State state) {
-		session=sessionFactory.openSession();
-		Transaction tx = session.beginTransaction();
+		openSession();
 		if(state.getTime_Stamp()==null){
 			Date date= new Date();
 			state.setTime_Stamp(date);
 		}
 		session.saveOrUpdate(state);
-		tx.commit();
-		session.close();
+		closeSession();
 	}
 
 	
 	public void addStateDetails(State s, long userId) {
-		session=sessionFactory.openSession();
-		Transaction tx = session.beginTransaction();
+		openSession();
 		State_Details sd = new State_Details();
 		sd.setState_Id(s.getId());
 		sd.setUser_Id(userId);
@@ -83,62 +80,75 @@ public class StateDaoImpl implements IStateDao{
 		sd.setTime_Date(timestamp);
 		sd.setTime_Stamp(timestamp);
 		session.saveOrUpdate(sd);
-		tx.commit();
-		session.close();
+		closeSession();
 	}
 	
 	public void addStateDetails(State_Details state_details){
-		session=sessionFactory.openSession();
-		Transaction tx = session.beginTransaction();
+		openSession();
 		session.saveOrUpdate(state_details);
-		tx.commit();
-		session.close();
+		closeSession();
 	}
 
 	public List<State_Details> getAllStateDetails() {
-		session=sessionFactory.openSession();
-		Transaction tx=session.beginTransaction();
+		openSession();
 		Query q=session.getNamedQuery("StateDetails.getStateDetails");
 		List<State_Details> sd = (List<State_Details>) q.list();
-		tx.commit();
-		session.close();
+		closeSession();
 		return sd;
 	}
 
 	public List<State> getStatesFromTimestamp(String timestamp) {
-		session=sessionFactory.openSession();
-		Transaction tx=session.beginTransaction();
+		List<State> res = new ArrayList<State>();
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+		openSession();
 		Query q=session.getNamedQuery("State.getStatesFromTimestamp");
-		q.setString("timestamp", timestamp);
-		List<State> res = q.list();
-		tx.commit();
-		session.close();
+		try {
+			Date d= f.parse(timestamp);
+			q.setString("timestamp", String.valueOf(d.getTime()));
+			res = q.list();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		closeSession();
 		return res;
 	}
 
 	@Override
 	public List<State_Details> getStateDetailsByIdFromTimestamp(String user_id, String timestamp) {
-		session=sessionFactory.openSession();
-		Transaction tx=session.beginTransaction();
+		List<State_Details> res = new ArrayList<State_Details>();
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+		openSession();
 		Query q=session.getNamedQuery("StateDetails.getStateDetailsByIdFromTimestamp");
-		q.setString("timestamp", timestamp);
-		q.setString("user_id", user_id);
-		List<State_Details> res = q.list();
-		tx.commit();
-		session.close();
+		try {
+			Date d= f.parse(timestamp);
+			q.setString("timestamp", String.valueOf(d.getTime()));
+			q.setString("user_id", user_id);
+			res = q.list();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		closeSession();
 		return res;
 	}
 
 	@Override
 	public List<State_Details> getAllStateDetailsByUserId(String user_id) {
-		session=sessionFactory.openSession();
-		Transaction tx=session.beginTransaction();
+		openSession();
 		Query q=session.getNamedQuery("StateDetails.getStateDetailsByUserId");
 		q.setString("user_id", user_id);
 		List<State_Details> res = q.list();
+		closeSession();
+		return res;
+	}
+	
+	private void openSession(){
+		session=sessionFactory.openSession();
+		tx=session.beginTransaction();
+	}
+	
+	private void closeSession(){
 		tx.commit();
 		session.close();
-		return res;
 	}
 
 }

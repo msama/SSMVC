@@ -27,7 +27,6 @@ public class UserDaoImpl implements IUserDao{
 	@Resource(name = "sessionFactory")
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
-		session=sessionFactory.openSession();
 	}
 	
 	public SessionFactory getSessionFactory() {
@@ -36,17 +35,24 @@ public class UserDaoImpl implements IUserDao{
 
 	@Transactional(readOnly = true)
 	public List<User> findAllUsers() {
-		return session.createQuery("from User c")
+		openSession();
+		List<User> list = session.createQuery("from User c")
 				.list();
+		closeSession();
+		return list;
 	}
 
 	public List<User> findAllUsersWithStates() {
-		return session.getNamedQuery("User.findWithStateDetails").list();
+		openSession();
+		List<User> list=session.getNamedQuery("User.findWithStateDetails").list();
+		closeSession();
+		return list;
 	}
 
 	
 	@Transactional(readOnly = true)
 	public loginResponse checkCredentials(String username, String password) {
+		openSession();
 		Query q=session.getNamedQuery("User.checkCredentials");
 		q.setParameter("username", username);
 		q.setParameter("password", password);
@@ -62,19 +68,28 @@ public class UserDaoImpl implements IUserDao{
 			Set<User_Role> userRoleSet = user.get(0).getUserRole();
 			res.setUserRoleSet(userRoleSet);
 		}
+		closeSession();
 		return res;
 	}
 	
 	@Transactional(readOnly = true)
 	public String findAllUser_Roles(){
+		openSession();
 		List<User_Role> list = session.createQuery("select distinct u from User_Role u left join fetch u.role r" +
 				"left join fetch u.user us").list();
 		String s="";
-		System.out.println("DONE");
 		for(User_Role ur:list){
 			s+="USer:"+ur.getUser().getFirstName()+" Role:"+ur.getRole().getDescription()+" from:"+ur.getFromDate()+"\n";
 		}
+		closeSession();
 		return s;
 	}
 
+	private void openSession(){
+		session=sessionFactory.openSession();
+	}
+	
+	private void closeSession(){
+		session.close();
+	}
 }

@@ -14,10 +14,10 @@
 
 	<mvc:annotation-driven />
 	
-	<jdbc:embedded-database id="dataSource" type="H2"> 
+	<!--  <jdbc:embedded-database id="dataSource" type="H2"> 
 		<jdbc:script location="classpath:model.sql"/> 
 		<jdbc:script location="classpath:model-data.sql"/>  
-	</jdbc:embedded-database>	
+	</jdbc:embedded-database>	-->
 	
 	 
 	
@@ -31,16 +31,23 @@
 	
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
+		<!--  <property name="dataSource" ref="dataSource" />-->
 		<property name="packagesToScan" value="com.ssmvc.server.model" />
 		<property name="hibernateProperties">
 			<props>
-				<prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+				<!--  <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
 				<prop key="hibernate.max_fetch_depth">3</prop>
 				<prop key="hibernate.jdbc.fetch_size">50</prop>
 				<prop key="hibernate.jdbc.batch_size">10</prop>
-				<prop key="hibernate.show_sql">true</prop>
-			</props>
+				<prop key="hibernate.show_sql">true</prop>-->
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.dialect">com.ssmvc.server.hibernate.SQLiteDialect</prop>
+				<prop key="hibernate.connection.driver_class">org.sqlite.JDBC</prop>
+				<prop key="hibernate.connection.url">jdbc:sqlite:/Users/mircobordoni/Development/WorkspaceAndroid/SSMVC/Spring/ServerSample/data.db</prop>
+				<prop key="hibernate.connection.username"></prop>
+				<prop key="hibernate.connection.password"></prop>		
+			</props>	
 		</property>
 	</bean>  
 		

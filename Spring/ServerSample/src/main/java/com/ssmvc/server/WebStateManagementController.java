@@ -148,8 +148,14 @@ public class WebStateManagementController {
 		List<State_Details> stateDetails = stateDao.getAllStateDetails();
 		List<State_Details> resultStates = new LinkedList<State_Details>() ;
 		long userid=SessionManager.getUserId(sess);
+		System.out.println("userid:"+userid);
+		System.out.println("size stateDetails:"+stateDetails.size());
 		for(State_Details sd:stateDetails){
 			if(sd.getUser_Id()==userid)resultStates.add(sd);
+		}
+		System.out.println("size resultStates:"+resultStates.size());
+		for(State_Details s: resultStates){
+			System.out.println(s.toString());
 		}
 		model.put("StateDetailsList", resultStates);
 		return "StateDetails";

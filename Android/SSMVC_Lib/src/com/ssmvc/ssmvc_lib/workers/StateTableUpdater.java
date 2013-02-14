@@ -38,6 +38,7 @@ public class StateTableUpdater extends Thread{
 			try {
 				if(!result.getBoolean("success"))return;
 				JSONArray rows = result.getJSONArray("rows");
+				System.out.println("rows.length?"+rows.length());
 				JSONObject record;
 				for(int i=0; i<rows.length();i++){
 					record = rows.getJSONObject(i);

@@ -42,9 +42,7 @@ public class DatabaseCreator extends SQLiteOpenHelper{
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		System.out.println("Creazione");
-		db.execSQL("DROP TABLE STATE");
 		db.execSQL(CREATE_STATE);
-		db.execSQL("DROP TABLE STATE_DETAILS");
 		db.execSQL(CREATE_STATE_DETAILS);
 	}
 

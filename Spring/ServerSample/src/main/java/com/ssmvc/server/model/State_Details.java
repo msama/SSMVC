@@ -1,6 +1,8 @@
 package com.ssmvc.server.model;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.*;
@@ -10,7 +12,7 @@ import javax.persistence.*;
 @Table(name="state_details")
 @NamedQueries({
 	@NamedQuery(name="StateDetails.getStateDetails",
-			query="select sd from State_Details sd left join fetch sd.state left join fetch sd.user"),
+			query="select sd from State_Details sd join fetch sd.state join fetch sd.user"),
 	@NamedQuery(name="StateDetails.getStateDetailsByUserId",
 	query="select sd from State_Details sd left join fetch sd.user where user_id=:user_id"),
 	@NamedQuery(name="StateDetails.getStateDetailsFromTimestamp",
@@ -87,8 +89,10 @@ public class State_Details implements Serializable{
 	}
 	
 	public String toString(){
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+		
 		return "State Details - State_Id:"+this.State_Id+" User_Id:"+this.User_Id+
-				" Date:"+this.Time_Date;
+				" Date:"+formatter.format(this.Time_Date)+"  "+this.Time_Date;
 	}
 	
 	@Column(name="TIME_STAMP")

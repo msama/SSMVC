@@ -13,7 +13,7 @@ import com.ssmvc.ssmvc_lib.R;
 import com.ssmvc.ssmvc_lib.dbDAO;
 import com.ssmvc.ssmvc_lib.services.IPersistanceCallbacks;
 
-public class StateTableWriter extends Thread {
+public class StateTableWriter implements IWorker {
 
 	private ArrayList<String[]> paramList;
 	private IPersistanceCallbacks resultProcessor;
@@ -23,7 +23,7 @@ public class StateTableWriter extends Thread {
 		this.resultProcessor = resultProcessor;
 	}
 
-	public void run() {
+	public void doJob(Object...params) {
 		Cursor c = dbDAO.getAllStates(1);
 		JSONObject param = new JSONObject();
 		try {

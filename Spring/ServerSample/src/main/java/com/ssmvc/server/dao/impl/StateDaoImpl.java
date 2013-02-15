@@ -99,16 +99,17 @@ public class StateDaoImpl implements IStateDao{
 
 	public List<State> getStatesFromTimestamp(String timestamp) {
 		List<State> res = new ArrayList<State>();
-		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+		//SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 		openSession();
 		Query q=session.getNamedQuery("State.getStatesFromTimestamp");
-		try {
-			Date d= f.parse(timestamp);
-			q.setString("timestamp", String.valueOf(d.getTime()));
+//		try {
+			//Date d= f.parse(timestamp);
+			System.out.println("qua timestamp:"+timestamp);
+			q.setString("timestamp", timestamp);
 			res = q.list();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//		}
 		closeSession();
 		return res;
 	}
@@ -119,14 +120,14 @@ public class StateDaoImpl implements IStateDao{
 		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 		openSession();
 		Query q=session.getNamedQuery("StateDetails.getStateDetailsByIdFromTimestamp");
-		try {
-			Date d= f.parse(timestamp);
-			q.setString("timestamp", String.valueOf(d.getTime()));
+//		try {
+			//Date d= f.parse(timestamp);
+			q.setString("timestamp", timestamp);
 			q.setString("user_id", user_id);
 			res = q.list();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//		}
 		closeSession();
 		return res;
 	}

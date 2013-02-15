@@ -8,7 +8,7 @@ import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -74,6 +74,7 @@ public class JSonStateController {
 		}else{
 			// else get records from State table having timestamp > latest client timestamp
 			states= stateDao.getStatesFromTimestamp(newStatesReqModel.getTimestamp());
+			System.out.println("Timestamp received:"+newStatesReqModel.getTimestamp());
 		}
 		
 		// Add each record to a JSon Object
@@ -85,7 +86,7 @@ public class JSonStateController {
 			row = new JSONObject();
 			row.put("ID", s.getId());
 			row.put("DESCRIPTION", s.getDescription());
-			row.put("TIME_STAMP", s.getTime_Stamp().toString());
+			row.put("TIME_STAMP", s.getTime_Stamp().getTime());
 			results.add(row);
 			
 			System.out.println(s.getId() + "  " +s.getDescription()+"  "+s.getTime_Stamp() );
@@ -139,15 +140,15 @@ public class JSonStateController {
         	s = new State();
         	s.setId(n.getId());
         	s.setDescription(n.getDescription());
-        	Date d;
-			try {
-				d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(n.getTimestamp());
-			} catch (ParseException e) {
-				obj.put("success", false);
-		        out.print(obj);
-		        e.printStackTrace();
-				return;
-			}
+        	Date d=new Date(Long.parseLong(n.getTimestamp()));
+//			try {
+//				d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(n.getTimestamp());
+//			} catch (ParseException e) {
+//				obj.put("success", false);
+//		        out.print(obj);
+//		        e.printStackTrace();
+//				return;
+//			}
         	s.setTime_Stamp(d);
         	stateDao.addState(s);
         }

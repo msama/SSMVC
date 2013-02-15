@@ -101,26 +101,9 @@ public class dbDAO {
 	 */
 	public static Cursor getAllStateDetails(String id){
 		return database.rawQuery("select s.rowid _id, s.description, sd.time_date from state s " +
-				"inner join state_details sd on s.id=sd.state_id where sd.user_id='"+id+"'", null);
+				"inner join state_details sd on s.id=sd.state_id where sd.user_id='"+id+"' order by sd.time_date desc", null);
 	}
 	
-	public static void initStateDetails(){
-		database.delete("STATE_DETAILS", null, null);
-		Date date= new Date();
-		Timestamp timestamp = new Timestamp(date.getTime());
-		ContentValues content = new ContentValues();
-		content.put("USER_ID", 1);
-		content.put("STATE_ID", 1);
-		content.put("TIME_DATE", timestamp.toString() );
-		long l = database.insert("STATE_DETAILS", null, content);
-		
-		timestamp = new Timestamp(date.getTime());
-		content = new ContentValues();
-		content.put("USER_ID", 2);
-		content.put("STATE_ID", 2);
-		content.put("TIME_DATE", timestamp.toString() );
-		l = database.insert("STATE_DETAILS", null, content);
-	}
 	
 	/**
 	 * Get the most recent timestamp from the STATE table

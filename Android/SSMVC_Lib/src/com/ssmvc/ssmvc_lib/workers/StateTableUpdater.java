@@ -20,7 +20,7 @@ import com.ssmvc.ssmvc_lib.services.IPersistanceCallbacks;
  * Thread used to asynchronously send an HTTP request to the server and process the response.
  * This thread gets new records from the remote table STATE and insert them in the local table STATE.
  */
-public class StateTableUpdater extends Thread{
+public class StateTableUpdater implements IWorker{
 	
 	private IPersistanceCallbacks resultProcessor;
 	private ArrayList<String[]> paramsList;
@@ -30,7 +30,7 @@ public class StateTableUpdater extends Thread{
 		this.resultProcessor=resultProcessor;
 	}
 	
-	public void run(){
+	public void doJob(Object...params){
 		Context context=resultProcessor.getContext();
 		JSONObject result = HTTPRequestManager.sendRequest(paramsList,context.getString(R.string.getNewStatesURI));
 		if(result.length()!=0){

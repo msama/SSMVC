@@ -57,6 +57,7 @@ public class WelcomeActivity extends Activity implements OnClickListener,
 		// Create a new Session manager
 		SessionManager.checkLogin();
 		dbDAO.removeStatesDetails();
+		dbDAO.removeAllStates();
 		HashMap<String, String> details = SessionManager.getDetails();
 		detailsTextView.setText("Welcome " + details.get("name") + " "
 				+ details.get("surname"));
@@ -128,9 +129,8 @@ public class WelcomeActivity extends Activity implements OnClickListener,
 						"Insert a Description for the State", this);
 			}
 			Date date= new Date();
-			Timestamp timestamp = new Timestamp(date.getTime());
 			persistanceService.insertNewState(this,UUID.randomUUID().toString(),
-					newState.getText().toString(),timestamp.toString(),params);
+					newState.getText().toString(),String.valueOf(date.getTime()),params);
 		}else if(v==((Button) findViewById(R.id.DeleteAllStatesButton))){
 			dbDAO.removeAllStates();
 			persistanceService.getAllStates(resultProcessor,params);
@@ -139,11 +139,9 @@ public class WelcomeActivity extends Activity implements OnClickListener,
 			Cursor item = (Cursor) spinner.getSelectedItem();
 			String state_id=item.getString(item.getColumnIndex("_id"));
 			System.out.println("state_id="+state_id);
-			Date date= new Date();
-			Timestamp timestamp = new Timestamp(date.getTime());
-			
+			Date date= new Date();			
 			persistanceService.insertNewStateDetails(this, 
-					SessionManager.getUserId(), state_id, timestamp.toString(), params);
+					SessionManager.getUserId(), state_id, String.valueOf(date.getTime()), params);
 		}
 	}
 
@@ -195,6 +193,7 @@ public class WelcomeActivity extends Activity implements OnClickListener,
 			params.add(new String[]{"uuid",SessionManager.getUUID()});
 			// Call persistance service method to update local states with new ones from server
 			persistanceService.getAllStates(resultProcessor,params);
+			persistanceService.getAllStateDetails(resultProcessor, params, SessionManager.getUserId());
 			isBound = true;
 		}
 

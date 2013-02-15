@@ -2,9 +2,7 @@ package com.ssmvc.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -146,14 +144,14 @@ public class JSonStateDetailsController {
         	sd = new State_Details();
         	sd.setUser_Id(Long.parseLong(n.getUser_id()));
         	sd.setState_Id(n.getState_id());
-        	Date d;
-			try {
-				d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(n.getTimestamp());
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return;
-			}
+        	Date d=new Date(Long.parseLong(n.getTimestamp()));
+//			try {
+//				d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(n.getTimestamp());
+//			} catch (ParseException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//				return;
+//			}
         	sd.setTime_Date(d);
         	sd.setTime_Stamp(d);
         	stateDao.addStateDetails(sd);

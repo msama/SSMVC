@@ -4,7 +4,7 @@
     <string name="app_name">SSMVC_Lib</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="serverURI">http://10.16.101.160:8080/server/</string>
+    <string name="serverURI">http://10.16.101.163:8080/server/</string>
     <string name="updateState">JSonUpdateState</string>
     <string name="updateStateDetails">JSonUpdateStateDetails</string>
     

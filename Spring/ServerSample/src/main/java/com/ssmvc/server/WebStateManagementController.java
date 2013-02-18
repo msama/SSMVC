@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.ssmvc.server.dao.IStateDao;
 import com.ssmvc.server.formModel.StateFormModel;
@@ -36,22 +37,24 @@ public class WebStateManagementController {
 	 * @return
 	 */
 	@RequestMapping(value = "/addNewState", method = RequestMethod.POST)
-	public String addNewState(ModelMap model, @ModelAttribute("newstate") NewStateModel newStateModel,
+	public ModelAndView addNewState(@ModelAttribute("newstate") NewStateModel newStateModel,
 			@ModelAttribute(value="uuid") String sess, SessionStatus sessionStatus){
 		boolean stateDoesNotExist = true;
 		System.out.println("New state description:"+newStateModel.getDescription());
 		System.out.println("Session:"+sess);
 		System.out.println(SessionManager.sessionToString());
+		ModelAndView modelAndView;
 		if(!SessionManager.checkSession(sess)){
 			sessionStatus.setComplete();
-			model.put("Success", "Session Expired. Please Log In again!");
-			return "login";
+			modelAndView = new ModelAndView("redirect:login");
+			modelAndView.addObject("Success", "Session Expired. Please Log In again!");
+			return modelAndView;
 		}
-		model.addAttribute("Admin", true);
+		modelAndView = new ModelAndView("redirect:AdminStatesManagement");
 		List<State> stateList = stateDao.getAllStates();
 		for(State s:stateList){
 			if(s.getDescription().equals(newStateModel.getDescription())){
-				model.put("StateAlreadyExist", true);
+				//modelAndView.addObject("StateAlreadyExist", true);
 				stateDoesNotExist=false;
 			}
 		}
@@ -62,24 +65,19 @@ public class WebStateManagementController {
 			s.setTime_Stamp(null);
 			stateDao.addState(s);
 		}
-		stateList = stateDao.getAllStates();
-		model.put("StateList", stateList);
-		model.put("deleteStateModel", new StateFormModel());
-		model.put("newstate", new NewStateModel());
-		return "welcome";
+		return modelAndView;
 	}
 	
 	@RequestMapping(value = "/DeleteState", method = RequestMethod.POST)
-	public String deleteState(ModelMap model, @ModelAttribute("deleteStateModel") StateFormModel deleteStateModel,
+	public ModelAndView deleteState(ModelMap model, @ModelAttribute("deleteStateModel") StateFormModel deleteStateModel,
 			@ModelAttribute(value="uuid") String sess, SessionStatus sessionStatus){
 		System.out.println("delete state description:"+deleteStateModel.getDescription()+" id:"+deleteStateModel.getId());
 		System.out.println("Session:"+sess);
 		if(!SessionManager.checkSession(sess)){
 			sessionStatus.setComplete();
 			model.put("Success", "Session Expired. Please Log In again!");
-			return "login";
+			return new ModelAndView("login", model);
 		}
-		model.addAttribute("Admin", true);
 		System.out.println(SessionManager.sessionToString());
 		List<State> stateList = stateDao.getAllStates();
 		for(State s:stateList){
@@ -89,10 +87,7 @@ public class WebStateManagementController {
 			}
 				
 		}
-		stateList = stateDao.getAllStates();
-		model.put("StateList", stateList);
-		model.put("deleteStateModel", new StateFormModel());
-		return "welcome";
+		return new ModelAndView("redirect:AdminStatesManagement");
 	}
 	
 	
@@ -167,5 +162,16 @@ public class WebStateManagementController {
 		List<State> stateList = stateDao.getAllStates();
 		model.put("StateList", stateList);
 		return "welcome";
+	}
+	
+	@RequestMapping(value = "/AdminStatesManagement", method = RequestMethod.GET)
+	public String adminStateManagement(ModelMap model, @ModelAttribute(value="uuid") String sess){
+		model.addAttribute("Admin", true);
+		List<State> stateList = stateDao.getAllStates();
+		model.put("StateList", stateList);
+		model.put("deleteStateModel", new StateFormModel());
+		model.put("newstate", new NewStateModel());
+		return "welcome";
+		
 	}
 }

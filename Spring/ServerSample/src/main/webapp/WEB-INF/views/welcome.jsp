@@ -12,7 +12,12 @@
 <title>Insert title here</title>
 </head>
 <body>
-
+	<c:choose>
+	<c:when test="${StateAlreadyExist == true}">
+			<h2>State Already Exists!</h2>
+	</c:when>
+	</c:choose>
+	
 	<c:choose>
 		<c:when test="${Admin == true}">
 			<c:import url="AddNewState.jsp"></c:import>

@@ -1,8 +1,5 @@
 package com.ssmvc.ssmvc_lib;
 
-import java.sql.Timestamp;
-import java.util.Date;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;

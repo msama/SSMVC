@@ -60,11 +60,11 @@ public class SessionManager {
 		return s;
 	}
 	
-	public static long getUserId(String uuid){
+	public static Long getUserId(String uuid){
 		if(sessionMap.containsKey(uuid)){
 			return sessionMap.get(uuid).getId();
 		}
-		return -1;
+		return null;
 	}
 
 }

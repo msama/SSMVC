@@ -5,6 +5,8 @@ import java.util.List;
 public class JSonNewStateModel {
 
 	private String uuid;
+	private String timestamp;
+	
 	private List<JSonStateModel> rows;
 	
 	public List<JSonStateModel> getRows() {
@@ -19,4 +21,12 @@ public class JSonNewStateModel {
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
+	public String getTimestamp() {
+		return timestamp;
+	}
+	public void setTimestamp(String timestamp) {
+		this.timestamp = timestamp;
+	}
+	
+	
 }

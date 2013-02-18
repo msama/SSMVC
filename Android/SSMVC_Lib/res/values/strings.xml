@@ -5,10 +5,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="serverURI">http://10.16.101.160:8080/server/</string>
-    <string name="getNewStatesURI">JSonGetNewStates</string>
-    <string name="insertNewStatesURI">JSonInsertNewStates</string>
-    <string name="getNewStateDetailsURI">JSonGetNewStateDetails</string>
-    <string name="insertNewStateDetailsURI">JSonInsertNewStateDetails</string>
+    <string name="updateState">JSonUpdateState</string>
+    <string name="updateStateDetails">JSonUpdateStateDetails</string>
     
 
 </resources>

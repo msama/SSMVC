@@ -13,17 +13,18 @@ import com.ssmvc.ssmvc_lib.R;
 import com.ssmvc.ssmvc_lib.dbDAO;
 import com.ssmvc.ssmvc_lib.services.IPersistanceCallbacks;
 
-public class StateTableWriter implements IWorker {
+public class StateUpdater implements IWorker {
 
 	private ArrayList<String[]> paramList;
 	private IPersistanceCallbacks resultProcessor;
 
-	public StateTableWriter(IPersistanceCallbacks resultProcessor, ArrayList<String[]> paramList) {
+	public StateUpdater(IPersistanceCallbacks resultProcessor, ArrayList<String[]> paramList) {
 		this.paramList = paramList;
 		this.resultProcessor = resultProcessor;
 	}
 
-	public void doJob(Object...params) {
+	@Override
+	public void doJob(Object... params) {
 		Cursor c = dbDAO.getAllStates(1);
 		JSONObject param = new JSONObject();
 		try {
@@ -35,7 +36,7 @@ public class StateTableWriter implements IWorker {
 			c.moveToFirst();
 			JSONObject obj;
 			while (!c.isAfterLast()) {
-				obj=new JSONObject();
+				obj = new JSONObject();
 				obj.put("id", c.getString(c.getColumnIndex("ID")));
 				obj.put("description", c.getString(c.getColumnIndex("DESCRIPTION")));
 				obj.put("timestamp", c.getString(c.getColumnIndex("TIME_STAMP")));
@@ -43,13 +44,23 @@ public class StateTableWriter implements IWorker {
 				c.moveToNext();
 			}
 			param.put("rows", queryResult);
-			JSONObject response = HTTPRequestManager.sendRequest(param, resultProcessor.getContext().getString(R.string.insertNewStatesURI));
-			if(response.getBoolean("success")){
+			JSONObject response = HTTPRequestManager.sendRequest(param, resultProcessor
+					.getContext().getString(R.string.updateState));
+			if (response.getBoolean("success")) {
 				System.out.println("SUCCESS");
 				c.moveToFirst();
-				while(!c.isAfterLast()){
+				while (!c.isAfterLast()) {
 					dbDAO.updateState(c.getString(c.getColumnIndex("ID")), 0);
 					c.moveToNext();
+				}
+				JSONArray rows = response.getJSONArray("rows");
+				System.out.println("rows.length?" + rows.length());
+				JSONObject record;
+				for (int i = 0; i < rows.length(); i++) {
+					record = rows.getJSONObject(i);
+					System.out.println("ROW:" + rows.get(i));
+					dbDAO.addState(record.getString("ID"), record.getString("DESCRIPTION"),
+							record.getString("TIME_STAMP"), 0);
 				}
 				resultProcessor.onPersistanceResult();
 			}
@@ -58,4 +69,5 @@ public class StateTableWriter implements IWorker {
 			e.printStackTrace();
 		}
 	}
+
 }

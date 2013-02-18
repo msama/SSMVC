@@ -15,13 +15,11 @@ public final class R {
     }
     public static final class string {
         public static int app_name=0x7f030000;
-        public static int getNewStateDetailsURI=0x7f030006;
-        public static int getNewStatesURI=0x7f030004;
         public static int hello_world=0x7f030001;
-        public static int insertNewStateDetailsURI=0x7f030007;
-        public static int insertNewStatesURI=0x7f030005;
         public static int menu_settings=0x7f030002;
         public static int serverURI=0x7f030003;
+        public static int updateState=0x7f030004;
+        public static int updateStateDetails=0x7f030005;
     }
     public static final class style {
         /** 

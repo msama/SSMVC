@@ -1,15 +1,10 @@
 package com.ssmvc.ssmvc_lib.services;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import com.ssmvc.ssmvc_lib.dbDAO;
-import com.ssmvc.ssmvc_lib.workers.StateDetailsTableUpdater;
-import com.ssmvc.ssmvc_lib.workers.StateDetailsTableWriter;
-import com.ssmvc.ssmvc_lib.workers.StateTableUpdater;
-import com.ssmvc.ssmvc_lib.workers.StateTableWriter;
+import com.ssmvc.ssmvc_lib.workers.StateDetailsUpdater;
+import com.ssmvc.ssmvc_lib.workers.StateUpdater;
 import com.ssmvc.ssmvc_lib.workers.WorkDispatcher;
 
 import android.app.Service;
@@ -35,41 +30,27 @@ public class PersistanceService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		cm = (ConnectivityManager) this
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
 		workDispatcher = new WorkDispatcher();
 		workDispatcher.start();
 		return binder;
 	}
 
 	/**
-	 * This method is used to read new STATE table records from the remote
-	 * database and insert them in the local STATE table.
+	 * This method is used to synchronize local STATE table with the remote one.
 	 * 
 	 * @param resultProcessor
 	 *            Object that will handle the results of this method
 	 * @param params
 	 *            List of params to send to the server
 	 */
-	public void getAllStates(IPersistanceCallbacks resultProcessor,
-			ArrayList<String[]> params) {
-		networkInfo = cm.getActiveNetworkInfo();
-		if (networkInfo != null) {
-			String last_timestamp = dbDAO.getStateLastTimestamp();
-			String[] p = new String[] { "timestamp", last_timestamp==null?null:last_timestamp };
-			params.add(p);
-			StateTableUpdater stu = new StateTableUpdater(params,
-					resultProcessor);
-			workDispatcher.addWork(stu);
-		} else {
-			resultProcessor.onPersistanceResult();
-		}
+	public void getAllStates(IPersistanceCallbacks resultProcessor, ArrayList<String[]> params) {
+		updateState(resultProcessor, params);
 	}
 
 	/**
-	 * This method is used to insert a new record into the local STATE table. If
-	 * a network connection is available it pushes the inserted records to the
-	 * remote database.
+	 * This method is used to insert a new record into the local STATE table. 
+	 * Then it synchronizes local STATE table with the remote one.
 	 * 
 	 * @param resultProcessor
 	 *            Object that will handle the results of this method
@@ -83,23 +64,15 @@ public class PersistanceService extends Service {
 	 *            list of application specific parameters to be sent to the
 	 *            server
 	 */
-	public void insertNewState(IPersistanceCallbacks resultProcessor,
-			String id, String description, String timestamp,
-			ArrayList<String[]> params) {
+	public void insertNewState(IPersistanceCallbacks resultProcessor, String id,
+			String description, String timestamp, ArrayList<String[]> params) {
 		dbDAO.addState(id, description, timestamp, 1);
-		networkInfo = cm.getActiveNetworkInfo();
-		if (networkInfo != null) {
-			StateTableWriter stw = new StateTableWriter(resultProcessor, params);
-			workDispatcher.addWork(stw);
-		} else {
-			resultProcessor.onPersistanceResult();
-		}
+		updateState(resultProcessor, params);
 	}
 
 	/**
-	 * This method is used to insert a new record into the local STATE_DETAILS
-	 * table. If a network connection is available it pushes the inserted
-	 * records to the remote database.
+	 * This method is used to insert a new record into the local STATE_DETAILS table. 
+	 * Then it synchronizes local STATE_DETAILS table with the remote one.
 	 * 
 	 * @param resultProcessor
 	 *            Object that will handle the results of this method
@@ -113,32 +86,63 @@ public class PersistanceService extends Service {
 	 *            list of application specific parameters to be sent to the
 	 *            server
 	 */
-	public void insertNewStateDetails(IPersistanceCallbacks resultProcessor,
-			String user_id, String state_id, String timestamp,
-			ArrayList<String[]> params) {
+	public void insertNewStateDetails(IPersistanceCallbacks resultProcessor, String user_id,
+			String state_id, String timestamp, ArrayList<String[]> params) {
 		dbDAO.addStateDetails(user_id, state_id, timestamp, 1);
+		updateStateDetails(resultProcessor, params, user_id);
+	}
+
+	/**
+	 * This method is used to synchronize local STATE_DETAILS table with the remote one.
+	 * 
+	 * @param resultProcessor
+	 * @param params
+	 * @param user_id
+	 */
+	public void getAllStateDetails(IPersistanceCallbacks resultProcessor,
+			ArrayList<String[]> params, String user_id) {
+		updateStateDetails(resultProcessor, params, user_id);
+	}
+	
+	/**
+	 * If a network connection is available this methods add a new StateUpdater work to the 
+	 * WorkDispatcher queue. Otherwise it simply calls the method onPersistanceResult of the
+	 * resultProcessor passed.
+	 * 
+	 * @param resultProcessor Object that will handle the result of this operation
+	 * @param params parameters to be sent to the server
+	 */
+	private void updateState(IPersistanceCallbacks resultProcessor, ArrayList<String[]> params){
 		networkInfo = cm.getActiveNetworkInfo();
 		if (networkInfo != null) {
-			StateDetailsTableWriter sdtw = new StateDetailsTableWriter(
-					resultProcessor, params);
-			workDispatcher.addWork(sdtw);
+			String last_timestamp = dbDAO.getStateLastTimestamp();
+			String[] p = new String[] { "timestamp", last_timestamp == null ? null : last_timestamp };
+			params.add(p);
+			StateUpdater su = new StateUpdater(resultProcessor, params);
+			workDispatcher.addWork(su);
 		} else {
 			resultProcessor.onPersistanceResult();
 		}
 	}
-
-	public void getAllStateDetails(IPersistanceCallbacks resultProcessor,
-			ArrayList<String[]> params, String user_id) {
+	
+	/**
+	 * If a network connection is available this methods add a new StateDetailsUpdater work to the 
+	 * WorkDispatcher queue. Otherwise it simply calls the method onPersistanceResult of the
+	 * resultProcessor passed.
+	 * 
+	 * @param resultProcessor Object that will handle the result of this operation
+	 * @param params parameters to be sent to the server
+	 * @param user_id Identifier of the user
+	 */
+	private void updateStateDetails(IPersistanceCallbacks resultProcessor,
+			ArrayList<String[]> params, String user_id){
 		networkInfo = cm.getActiveNetworkInfo();
 		if (networkInfo != null) {
 			String last_timestamp = dbDAO.getStateDetailsLastTimestamp(user_id);
 			String[] p = new String[] { "timestamp", last_timestamp };
 			params.add(p);
-			p = new String[] { "user_id", user_id };
-			params.add(p);
-			StateDetailsTableUpdater sdtu = new StateDetailsTableUpdater(
-					params, resultProcessor);
-			workDispatcher.addWork(sdtu);
+			StateDetailsUpdater sdu = new StateDetailsUpdater(resultProcessor, params);
+			workDispatcher.addWork(sdu);
 		} else {
 			resultProcessor.onPersistanceResult();
 		}

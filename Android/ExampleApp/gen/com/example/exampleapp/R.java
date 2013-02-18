@@ -45,19 +45,17 @@ public final class R {
         public static final int main_activity=0x7f060001;
     }
     public static final class string {
-        public static final int LoginButton=0x7f040008;
+        public static final int LoginButton=0x7f040006;
         public static final int app_name=0x7f040000;
-        public static final int getNewStateDetailsURI=0x7f040006;
-        public static final int getNewStatesURI=0x7f040004;
         public static final int hello_world=0x7f040001;
-        public static final int insertNewStateDetailsURI=0x7f040007;
-        public static final int insertNewStatesURI=0x7f040005;
-        public static final int loginURI=0x7f04000a;
-        public static final int logoutURI=0x7f04000b;
+        public static final int loginURI=0x7f040008;
+        public static final int logoutURI=0x7f040009;
         public static final int menu_settings=0x7f040002;
         public static final int serverURI=0x7f040003;
-        public static final int title_activity_states_digest=0x7f04000c;
-        public static final int title_activity_welcome=0x7f040009;
+        public static final int title_activity_states_digest=0x7f04000a;
+        public static final int title_activity_welcome=0x7f040007;
+        public static final int updateState=0x7f040004;
+        public static final int updateStateDetails=0x7f040005;
     }
     public static final class style {
         /** 

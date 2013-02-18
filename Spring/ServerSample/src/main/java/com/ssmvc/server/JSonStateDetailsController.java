@@ -16,13 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ssmvc.server.dao.IStateDao;
-import com.ssmvc.server.formModel.JSonGetNewStateDetailsReqModel;
-import com.ssmvc.server.formModel.JSonGetNewStatesReqModel;
 import com.ssmvc.server.formModel.JSonNewStateDetailsModel;
-import com.ssmvc.server.formModel.JSonNewStateModel;
 import com.ssmvc.server.formModel.JSonStateDetailsModel;
-import com.ssmvc.server.formModel.JSonStateModel;
-import com.ssmvc.server.model.State;
 import com.ssmvc.server.model.State_Details;
 import com.ssmvc.server.utils.SessionManager;
 
@@ -33,15 +28,12 @@ public class JSonStateDetailsController {
 	
 	
 	/**
-	 * Controller used to manage State_Details table synchronization. The client can use the URI /JSonGetNewStateDetails 
-	 * to fetch new State_Details inserted in the State_Details table from a certain timestamp on. 
-	 * The client has to provide its uuid (the session identifier), the last timestamp in its local STATE_DETAILS table 
-	 * and its user_id.
-	 * @param resp HTTP response
-	 * @param newStateDetailsReqModel Object that will contain client uuid, latest timestamp and user_id
+	 * Controller used to manage State_Details table synchronization. 
+	 * @param resp
+	 * @param newStateDetailsReqModel
 	 */
-	@RequestMapping(value = "/JSonGetNewStateDetails", method = RequestMethod.POST)
-	public void jsonGetNewStateDetails(HttpServletResponse resp,@RequestBody JSonGetNewStateDetailsReqModel newStateDetailsReqModel){
+	@RequestMapping(value = "/JSonUpdateStateDetails", method = RequestMethod.POST)
+	public void jsonUpdateStateDetails(HttpServletResponse resp,@RequestBody JSonNewStateDetailsModel newStateDetailsModel){
 		PrintWriter out=null;
 		resp.setCharacterEncoding("utf8");
         resp.setContentType("application/json"); 
@@ -53,35 +45,34 @@ public class JSonStateDetailsController {
 		} 
         JSONObject obj = new JSONObject();
         // If no uuid is provided return success=false to the client
-		if(newStateDetailsReqModel.getUuid()==null){
+		if(newStateDetailsModel.getUuid()==null){
 			obj.put("success", false);
 			out.print(obj);
 			return;
 		}else // If no session exists associated to client uuid return success=false to the client
-			if(!SessionManager.checkSession(newStateDetailsReqModel.getUuid())){
+			if(!SessionManager.checkSession(newStateDetailsModel.getUuid())){
 				obj.put("success", false);
 				out.print(obj);
 				return;
 		}
-		System.out.println("uuid:"+newStateDetailsReqModel.getUuid());
-		System.out.println("timestamp:"+newStateDetailsReqModel.getTimestamp());
-		System.out.println("user_id:"+newStateDetailsReqModel.getUser_id());
+		System.out.println("uuid:"+newStateDetailsModel.getUuid());
+		System.out.println("timestamp:"+newStateDetailsModel.getTimestamp());
+		System.out.println("user_id:"+SessionManager.getUserId(newStateDetailsModel.getUuid()));
 		List<State_Details> state_details;
 		// If no timestamp is provided by the client
-		if(newStateDetailsReqModel.getTimestamp()==null){
-			if(newStateDetailsReqModel.getUser_id()==null)
+		if(newStateDetailsModel.getTimestamp()==null){
+			if(SessionManager.getUserId(newStateDetailsModel.getUuid())==null)
 				state_details = stateDao.getAllStateDetails();	// get all records from State_Details table
 			else
-				state_details = stateDao.getAllStateDetailsByUserId(newStateDetailsReqModel.getUser_id());
+				state_details = stateDao.getAllStateDetailsByUserId(String.valueOf(SessionManager.getUserId(newStateDetailsModel.getUuid())));
 		}else{
 			// else get records from State_Details table having timestamp > latest client timestamp
-			state_details= stateDao.getStateDetailsByIdFromTimestamp(newStateDetailsReqModel.getUser_id(),
-					newStateDetailsReqModel.getTimestamp());
+			state_details= stateDao.getStateDetailsByIdFromTimestamp(String.valueOf(SessionManager.getUserId(newStateDetailsModel.getUuid())),
+					newStateDetailsModel.getTimestamp());
 		}
 		
 		// Add each record to a JSon Object
 		JSONObject resultObject = new JSONObject();
-		resultObject.put("success", true);
 		JSONArray results =  new JSONArray();
 		JSONObject row;
 		for(State_Details sd:state_details){
@@ -92,51 +83,12 @@ public class JSonStateDetailsController {
 			results.add(row);
 			
 			System.out.println("sent user_id:"+sd.getUser_Id() + " state_id:" +sd.getState_Id()+"  time_stamp:"+
-			sd.getTime_Stamp() );
+			sd.getTime_Stamp().getTime() );
 		}
 		System.out.println("results array size:"+results.size());
 		resultObject.put("rows", results);
 		
-		// Send the http response to the client
-		out.print(resultObject);
-	}
-	
-	
-
-	/**
-	 * Controller used to manage the insertion of new records in the State_Details table. Each record sent by the client
-	 * is stored in the State_Details table and, if everything works as expected, the client receives a positive acknowledge.
-	 * 
-	 * @param resp HTTP response
-	 * @param newStateDetailsModel Object that will contain client's uuid and the list of records to be inserted
-	 */
-	@RequestMapping(value = "/JSonInsertNewStateDetails", method = RequestMethod.POST)
-	public void jsonAddNewStateDetails(HttpServletResponse resp,@RequestBody JSonNewStateDetailsModel newStateDetailsModel){
-		System.out.println("JSonInsertNewStateDetails");
-		PrintWriter out=null;
-		resp.setCharacterEncoding("utf8");
-        resp.setContentType("application/json"); 
-        try {
-			out = resp.getWriter();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-        JSONObject obj = new JSONObject();
-        if(newStateDetailsModel.getUuid()==null){
-        	System.out.println("uuid null");
-			obj.put("success", false);
-			out.print(obj);
-			return;
-		}else // If no session exists associated to client uuid return success=false to the client
-			if(!SessionManager.checkSession(newStateDetailsModel.getUuid())){
-				System.out.println("session expired");
-				obj.put("success", false);
-				out.print(obj);
-				return;
-		}
-        System.out.println("JSON add new state details- uuid:"+newStateDetailsModel.getUuid());
-        State_Details sd;
+		State_Details sd;
         System.out.println("ricevute num rows:"+newStateDetailsModel.getRows().size());
         System.out.println("contenuto:\n"+newStateDetailsModel.toString());
         for(JSonStateDetailsModel n : newStateDetailsModel.getRows()){
@@ -145,18 +97,14 @@ public class JSonStateDetailsController {
         	sd.setUser_Id(Long.parseLong(n.getUser_id()));
         	sd.setState_Id(n.getState_id());
         	Date d=new Date(Long.parseLong(n.getTimestamp()));
-//			try {
-//				d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(n.getTimestamp());
-//			} catch (ParseException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//				return;
-//			}
         	sd.setTime_Date(d);
         	sd.setTime_Stamp(d);
         	stateDao.addStateDetails(sd);
         }
-        obj.put("success", true);
-        out.print(obj);
+        
+		resultObject.put("success", true);
+
+		// Send the http response to the client
+		out.print(resultObject);
 	}
 }

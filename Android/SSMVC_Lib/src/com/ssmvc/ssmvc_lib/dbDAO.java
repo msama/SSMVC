@@ -21,21 +21,9 @@ public class dbDAO {
 	
 	public dbDAO(Context context){
 		dbCreator = new DatabaseCreator(context);
-		//this.context = context;
 		database=dbCreator.getWritableDatabase();
 	}
 
-	public static void initStates(){
-		ContentValues content = new ContentValues();
-		Date date= new Date();
-		Timestamp timestamp = new Timestamp(date.getTime());
-		content.put("DESCRIPTION", "happy");
-		content.put("ID", 2);
-		content.put("STATE", 1);
-		content.put("TIME_STAMP", timestamp.toString());
-		database.insert("STATE", null, content);
-		
-	}
 	
 	/**
 	 * Delete all records from table STATE
@@ -106,11 +94,11 @@ public class dbDAO {
 	
 	
 	/**
-	 * Get the most recent timestamp from the STATE table
+	 * Get the most recent timestamp from the STATE table where the state of the record is 0
 	 * @return
 	 */
 	public static String getStateLastTimestamp(){
-		Cursor c = database.rawQuery("select max(time_stamp) as maxTime from state", null);
+		Cursor c = database.rawQuery("select max(s.time_stamp) as maxTime from state s where s.state=0", null);
 		if(c==null)return null;
 		c.moveToFirst();
 		if(!c.isAfterLast())return c.getString(c.getColumnIndex("maxTime"));
@@ -135,12 +123,28 @@ public class dbDAO {
 		return database.rawQuery("select * from state_details sd where sd.state='"+state+"'", null);
 	}
 	
+	/**
+	 * Update the STATE record identified by id and set its state value to the state passed as a 
+	 * parameter
+	 * 
+	 * @param id Identifier of the record to be updated
+	 * @param state State to be set in the updated record
+	 */
 	public static void updateState(String id, int state){
 		ContentValues args = new ContentValues();
 	    args.put("state", String.valueOf(state));
 	    database.update("state", args, "id='" + id+"'", null);
 	}
 
+	/**
+	 * Update the STATE_DETAILS record identified by user_id + state_id + time_date and set its state value to
+	 * the state passed as a parameter.
+	 * 
+	 * @param user_id User identifier of the record to be updated
+	 * @param state_id State identifier of the record to be updated
+	 * @param time_date Time_date of the record to be updated
+	 * @param state State to be set in the updated record
+	 */
 	public static void updateStateDetails(String user_id, String state_id,
 			String time_date, int state) {
 		ContentValues args = new ContentValues();
@@ -149,9 +153,15 @@ public class dbDAO {
 				null);
 		
 	}
-
+	
+	/**
+	 * Get the latest timestamp in the STATE_DETAILS table. Only records with state=0 are considered.
+	 * @param user_id
+	 * @return
+	 */
 	public static String getStateDetailsLastTimestamp(String user_id) {
-		Cursor c = database.rawQuery("select max(sd.time_stamp) as maxTime from state_details sd where sd.user_id='"+user_id+"'", null);
+		Cursor c = database.rawQuery("select max(sd.time_stamp) as maxTime from " +
+				"state_details sd where sd.user_id='"+user_id+"' and sd.state=0", null);
 		if(c==null)return null;
 		c.moveToFirst();
 		if(!c.isAfterLast())return c.getString(c.getColumnIndex("maxTime"));

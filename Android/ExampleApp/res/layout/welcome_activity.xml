@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WelcomeActivity" >
+
+    <TextView
+        android:id="@+id/DetailsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="39dp"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <Button
+        android:id="@+id/LogoutButton"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="18dp"
+        android:text="Logout" />
+
+    <Spinner
+        android:id="@+id/StateListSpinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/DetailsTextView"
+        android:layout_marginTop="19dp" />
+
+    <Button
+        android:id="@+id/SendStateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/StateListSpinner"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="36dp"
+        android:text="Send State" />
+
+    <Button
+        android:id="@+id/UpdateStatesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/StatesDigestButton"
+        android:layout_alignTop="@+id/LogoutButton"
+        android:text="Update State List" />
+
+    <EditText
+        android:id="@+id/NewState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/StatesDigestButton"
+        android:layout_below="@+id/StateListSpinner"
+        android:ems="10" />
+
+    <Button
+        android:id="@+id/SendNewStateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="Send New State" />
+
+    <Button
+        android:id="@+id/DeleteAllStatesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/SendNewStateButton"
+        android:layout_centerHorizontal="true"
+        android:text="Delete All States" />
+
+    <Button
+        android:id="@+id/StatesDigestButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/DeleteAllStatesButton"
+        android:layout_centerHorizontal="true"
+        android:text="See your states digest" />
+
+</RelativeLayout>
